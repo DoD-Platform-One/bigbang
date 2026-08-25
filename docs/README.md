@@ -131,6 +131,38 @@ Use these rules when writing links:
 
 Use this checklist before opening a merge request.
 
+### Package Integration Pages
+
+Package integration documentation has an additional metadata-driven workflow.
+Each package integrated into the Big Bang umbrella chart is registered in
+`chart/package-metadata.yaml`. The entry's `documentation` field points to its
+Big Bang integration guide under `docs/packages/core/` or
+`docs/packages/addons/`. More than one package may share a guide when the
+components are documented together, such as the Istio components.
+
+The metadata catalog is the source of truth for which integration guides appear
+in the package catalog and navigation. The generator uses it to maintain:
+
+- `docs/packages/index.md`.
+- `docs/packages/core/index.md` and `docs/packages/addons/index.md`.
+- `docs/packages/core/.pages` and `docs/packages/addons/.pages`.
+
+Edit the integration guide itself, but do not edit these generated indexes or
+navigation files directly. When adding or moving a package integration page:
+
+1. Create or move the Markdown guide in the appropriate `core` or `addons`
+   directory. Its first level-one heading (`#`) becomes its navigation label.
+2. Add or update the package's `documentation`, `displayName`, and `category`
+   in `chart/package-metadata.yaml`. Keep package keys alphabetized.
+3. Run `scripts/generate-package-schemas.sh --write` and review all generated
+   changes. This command also refreshes the package-derived schema and migration
+   metadata.
+4. Run `scripts/generate-package-schemas.sh --check` to confirm that generated
+   files are current before opening a merge request.
+
+For these package integration pages, this workflow replaces the generic
+instructions below to edit the section index and `.pages` file manually.
+
 1. Decide the intended section and URL.
 2. Place the Markdown file in the matching directory.
 3. If the page is the section landing page, name it `index.md`.

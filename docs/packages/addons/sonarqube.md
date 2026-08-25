@@ -1,4 +1,4 @@
-# Sonarqube
+# SonarQube
 
 ## Overview
 

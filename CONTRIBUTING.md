@@ -146,3 +146,25 @@ To verify that the committed reference is current without modifying it, run:
 ```shell
 scripts/generate-values-reference.sh --check
 ```
+
+### Generate Integrated Package Metadata
+
+Changes to `chart/package-metadata.yaml` require regenerating the package-derived
+schema, migration metadata, and documentation artifacts.
+
+After changing integrated package metadata, run:
+
+```shell
+scripts/generate-package-schemas.sh --write
+```
+
+To validate the metadata and confirm that all generated artifacts are current,
+run:
+
+```shell
+scripts/generate-package-schemas.sh --check
+```
+
+For the package integration documentation workflow and ownership of generated
+navigation files, see
+[Package Integration Pages](./docs/README.md#package-integration-pages).

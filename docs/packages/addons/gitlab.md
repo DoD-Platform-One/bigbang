@@ -1,4 +1,4 @@
-# Gitlab
+# GitLab
 
 ## Overview
 

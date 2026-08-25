@@ -1,4 +1,4 @@
-# OPA-Gatekeeper
+# OPA Gatekeeper
 
 # **DEPRECATED**: Kyverno is the preferred method to enforce policies within Big Bang as of version >=2.0.0
 

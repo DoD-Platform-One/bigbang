@@ -1,4 +1,4 @@
-# cert-manager Architecture
+# cert-manager
 
 cert-manager is an integrated Big Bang package that provisions the Kubernetes certificate management controller and its CRDs.
 

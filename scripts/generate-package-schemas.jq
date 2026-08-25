@@ -82,7 +82,7 @@ def validate_metadata($metadata):
   elif any($metadata.packages | to_entries[]; . as $package
            | ($package.key | type) != "string" or ($package.key | length) == 0
            or ($package.value | type) != "object"
-           or any(["displayName", "category", "legacyPath", "templateDirectory"][]; . as $field
+           or any(["displayName", "category", "legacyPath", "templateDirectory", "documentation"][]; . as $field
                   | ($package.value[$field]? // "") as $value
                   | ($value | type) != "string" or ($value | length) == 0)) then
     error("package metadata contains a missing or invalid required field")
@@ -93,6 +93,12 @@ def validate_metadata($metadata):
     error("package metadata templateDirectory values must use kebab-case directory names")
   elif any($metadata.packages[]; .category != "core" and .category != "addon") then
     error("package metadata category must be core or addon")
+  elif any($metadata.packages[];
+           .documentation != "docs/packages/\(if .category == "addon" then "addons" else .category end)/\(.documentation | split("/") | last)") then
+    error("package metadata documentation paths must match the package category")
+  elif any($metadata.packages[].documentation;
+           test("^docs/packages/(core|addons)/[a-z0-9]+(-[a-z0-9]+)*\\.md$") | not) then
+    error("package metadata documentation paths must name a package Markdown page")
   elif any($metadata.packages | to_entries[];
            .value.legacyPath != (if .value.category == "addon" then "addons.\(.key)" else .key end)) then
     error("package metadata legacyPath does not match its package name and category")

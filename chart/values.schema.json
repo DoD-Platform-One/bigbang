@@ -3631,6 +3631,118 @@
         }
       },
       "aliases": {
+        "alloy": {
+          "properties": {
+            "enabled": true,
+            "sourceType": true,
+            "releaseName": true,
+            "git": true,
+            "helmRepo": true,
+            "flux": true,
+            "values": true,
+            "postRenderers": true,
+            "additionalDestinations": true,
+            "alloyLogs": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "alloyMetrics": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "alloyClusterEvents": {
+              "enabled": {
+                "type": "boolean"
+              }
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "bbctl": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "registryOverrides": {
+              "description": "List of docker image registry hostnames to use in commands that deploy images.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "preflightCheck": {
+              "description": "Configuration values specific to the preflight-check command.",
+              "type": "object",
+              "properties": {
+                "image": {
+                  "description": "Image name including tag to deploy as the preflight check pod.",
+                  "type": "string"
+                }
+              }
+            },
+            "repoCredentials": {
+              "type": "object",
+              "items": {
+                "repo": {
+                  "description": "Hostname of the source code repository website.",
+                  "type": "string"
+                },
+                "username": {
+                  "description": "Username used to acess the repository. Only required when using a private repository.",
+                  "type": "string"
+                },
+                "password": {
+                  "description": "Password or API token used to acess the repository. Only required when using a private repository.",
+                  "type": "string"
+                },
+                "email": {
+                  "description": "Email address associated with the given repository credentials. Only required when using a private repository.",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
         "certManager": {
           "allOf": [
             {
@@ -3689,6 +3801,339 @@
           "type": "object",
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
+        "eckOperator": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "elasticsearchKibana": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "sso": {
+              "$ref": "#/$defs/packageAliasPartials/sso"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "license": {
+              "properties": {
+                "trial": {
+                  "type": "boolean"
+                },
+                "keyJSON": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "serviceAccountAnnotations": {
+              "properties": {
+                "elasticsearch": true,
+                "kibana": true
+              }
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "fluentbit": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "gatekeeper": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "gatewayAPI": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "grafana": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "enterprise": true,
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "sso": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "grafana": {
+                  "type": "object",
+                  "properties": {
+                    "client_id": {
+                      "type": "string"
+                    },
+                    "client_secret": {
+                      "type": "string"
+                    },
+                    "scopes": {
+                      "type": "string"
+                    },
+                    "allow_sign_up": {
+                      "type": "boolean"
+                    },
+                    "role_attribute_path": {
+                      "type": "string"
+                    },
+                    "token_url": {
+                      "type": "string"
+                    },
+                    "auth_url": {
+                      "type": "string"
+                    },
+                    "api_url": {
+                      "type": "string"
+                    },
+                    "tls_client_ca": {
+                      "type": "string"
+                    },
+                    "tls_skip_verify_insecure": {
+                      "type": "boolean"
+                    },
+                    "tls_client_cert": {
+                      "type": "string"
+                    },
+                    "tls_client_key": {
+                      "type": "string"
+                    },
+                    "allowed_domains": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
         "istioCNI": {
           "properties": {
             "git": {
@@ -3730,46 +4175,6 @@
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
         "istioCRDs": {
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            }
-          },
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "gatewayAPI": {
           "properties": {
             "git": {
               "$ref": "#/$defs/packageAliasPartials/git"
@@ -3930,46 +4335,6 @@
           "type": "object",
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "ztunnel": {
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            }
-          },
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
         "kiali": {
           "properties": {
             "git": {
@@ -4008,46 +4373,6 @@
             },
             "ingress": {
               "$ref": "#/$defs/packageAliasPartials/ingress"
-            }
-          },
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "gatekeeper": {
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
             }
           },
           "allOf": [
@@ -4203,192 +4528,6 @@
           "type": "object",
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "elasticsearchKibana": {
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "sso": {
-              "$ref": "#/$defs/packageAliasPartials/sso"
-            },
-            "ingress": {
-              "$ref": "#/$defs/packageAliasPartials/ingress"
-            },
-            "license": {
-              "properties": {
-                "trial": {
-                  "type": "boolean"
-                },
-                "keyJSON": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            "serviceAccountAnnotations": {
-              "properties": {
-                "elasticsearch": true,
-                "kibana": true
-              }
-            }
-          },
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "eckOperator": {
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            }
-          },
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "fluentbit": {
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            }
-          },
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "alloy": {
-          "properties": {
-            "enabled": true,
-            "sourceType": true,
-            "releaseName": true,
-            "git": true,
-            "helmRepo": true,
-            "flux": true,
-            "values": true,
-            "postRenderers": true,
-            "additionalDestinations": true,
-            "alloyLogs": {
-              "enabled": {
-                "type": "boolean"
-              }
-            },
-            "alloyMetrics": {
-              "enabled": {
-                "type": "boolean"
-              }
-            },
-            "alloyClusterEvents": {
-              "enabled": {
-                "type": "boolean"
-              }
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            }
-          },
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
         "loki": {
           "allOf": [
             {
@@ -4459,210 +4598,6 @@
               }
             }
           },
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "neuvector": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "ingress": {
-              "$ref": "#/$defs/packageAliasPartials/ingress"
-            },
-            "sso": {
-              "type": "object",
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                },
-                "client_id": {
-                  "type": "string"
-                },
-                "client_secret": {
-                  "type": "string"
-                },
-                "default_role": {
-                  "type": "string"
-                },
-                "issuer": {
-                  "type": "string"
-                },
-                "group_claim": {
-                  "type": "string"
-                },
-                "group_mapped_roles": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "group": {
-                        "type": "string"
-                      },
-                      "global_role": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                }
-              },
-              "additionalProperties": false
-            }
-          },
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "tempo": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "sso": {
-              "$ref": "#/$defs/packageAliasPartials/sso"
-            },
-            "ingress": {
-              "$ref": "#/$defs/packageAliasPartials/ingress"
-            },
-            "objectStorage": {
-              "type": "object",
-              "properties": {
-                "endpoint": {
-                  "type": "string"
-                },
-                "region": {
-                  "type": "string"
-                },
-                "accessKey": {
-                  "type": "string"
-                },
-                "accessSecret": {
-                  "type": "string"
-                },
-                "bucket": {
-                  "type": "string"
-                },
-                "insecure": {
-                  "type": "boolean"
-                }
-              }
-            },
-            "metricsGenerator": {
-              "type": "object",
-              "properties": {
-                "enabled": {
-                  "type": "boolean"
-                }
-              }
-            }
-          },
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "prometheusOperatorCRDs": {
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            }
-          },
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
           "additionalProperties": false,
           "type": "object",
           "description": "Partial override merged over the built-in package's legacy defaults."
@@ -4800,7 +4735,7 @@
           "type": "object",
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "grafana": {
+        "neuvector": {
           "allOf": [
             {
               "$ref": "#/$defs/packageAliasPartials/basePackage"
@@ -4835,7 +4770,6 @@
             "postRenderers": {
               "$ref": "#/$defs/packageAliasPartials/postRenderers"
             },
-            "enterprise": true,
             "istio": {
               "$ref": "#/$defs/packageAliasPartials/istio"
             },
@@ -4848,53 +4782,200 @@
                 "enabled": {
                   "type": "boolean"
                 },
-                "grafana": {
-                  "type": "object",
-                  "properties": {
-                    "client_id": {
-                      "type": "string"
-                    },
-                    "client_secret": {
-                      "type": "string"
-                    },
-                    "scopes": {
-                      "type": "string"
-                    },
-                    "allow_sign_up": {
-                      "type": "boolean"
-                    },
-                    "role_attribute_path": {
-                      "type": "string"
-                    },
-                    "token_url": {
-                      "type": "string"
-                    },
-                    "auth_url": {
-                      "type": "string"
-                    },
-                    "api_url": {
-                      "type": "string"
-                    },
-                    "tls_client_ca": {
-                      "type": "string"
-                    },
-                    "tls_skip_verify_insecure": {
-                      "type": "boolean"
-                    },
-                    "tls_client_cert": {
-                      "type": "string"
-                    },
-                    "tls_client_key": {
-                      "type": "string"
-                    },
-                    "allowed_domains": {
-                      "type": "string"
+                "client_id": {
+                  "type": "string"
+                },
+                "client_secret": {
+                  "type": "string"
+                },
+                "default_role": {
+                  "type": "string"
+                },
+                "issuer": {
+                  "type": "string"
+                },
+                "group_claim": {
+                  "type": "string"
+                },
+                "group_mapped_roles": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "group": {
+                        "type": "string"
+                      },
+                      "global_role": {
+                        "type": "string"
+                      }
                     }
-                  },
-                  "additionalProperties": false
+                  }
                 }
               },
               "additionalProperties": false
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "prometheusOperatorCRDs": {
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
+          },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "renovate": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "additionalProperties": false,
+          "type": "object",
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "tempo": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "sso": {
+              "$ref": "#/$defs/packageAliasPartials/sso"
+            },
+            "ingress": {
+              "$ref": "#/$defs/packageAliasPartials/ingress"
+            },
+            "objectStorage": {
+              "type": "object",
+              "properties": {
+                "endpoint": {
+                  "type": "string"
+                },
+                "region": {
+                  "type": "string"
+                },
+                "accessKey": {
+                  "type": "string"
+                },
+                "accessSecret": {
+                  "type": "string"
+                },
+                "bucket": {
+                  "type": "string"
+                },
+                "insecure": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "metricsGenerator": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                }
+              }
             }
           },
           "additionalProperties": false,
@@ -4980,12 +5061,7 @@
           "type": "object",
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "bbctl": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
+        "ztunnel": {
           "properties": {
             "git": {
               "$ref": "#/$defs/packageAliasPartials/git"
@@ -5014,51 +5090,18 @@
             },
             "postRenderers": {
               "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "registryOverrides": {
-              "description": "List of docker image registry hostnames to use in commands that deploy images.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "preflightCheck": {
-              "description": "Configuration values specific to the preflight-check command.",
-              "type": "object",
-              "properties": {
-                "image": {
-                  "description": "Image name including tag to deploy as the preflight check pod.",
-                  "type": "string"
-                }
-              }
-            },
-            "repoCredentials": {
-              "type": "object",
-              "items": {
-                "repo": {
-                  "description": "Hostname of the source code repository website.",
-                  "type": "string"
-                },
-                "username": {
-                  "description": "Username used to acess the repository. Only required when using a private repository.",
-                  "type": "string"
-                },
-                "password": {
-                  "description": "Password or API token used to acess the repository. Only required when using a private repository.",
-                  "type": "string"
-                },
-                "email": {
-                  "description": "Email address associated with the given repository credentials. Only required when using a private repository.",
-                  "type": "string"
-                }
-              }
             }
           },
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
           "additionalProperties": false,
           "type": "object",
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "renovate": {
+        "anchoreEnterprise": {
           "allOf": [
             {
               "$ref": "#/$defs/packageAliasPartials/basePackage"
@@ -5095,10 +5138,16 @@
             },
             "istio": {
               "$ref": "#/$defs/packageAliasPartials/istio"
-            }
+            },
+            "adminPassword": true,
+            "database": true,
+            "enterprise": true,
+            "ingress": true,
+            "redis": true,
+            "sso": true
           },
-          "additionalProperties": false,
           "type": "object",
+          "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
         "argocd": {
@@ -5191,7 +5240,48 @@
           "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "minioOperator": {
+        "externalSecrets": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "type": "object",
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "ingress": true
+          },
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "fortify": {
           "allOf": [
             {
               "$ref": "#/$defs/packageAliasPartials/basePackage"
@@ -5225,57 +5315,29 @@
             },
             "postRenderers": {
               "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "externalDatabase": {
+              "type": "object",
+              "properties": {
+                "host": {
+                  "type": "string",
+                  "default": "",
+                  "description": "External MySQL host used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
+                },
+                "port": {
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "default": 3306,
+                  "description": "External MySQL port used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
+                }
+              }
             },
             "istio": {
               "$ref": "#/$defs/packageAliasPartials/istio"
             },
             "ingress": true
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "minio": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "accesskey": true,
-            "ingress": true,
-            "secretkey": true
           },
           "type": "object",
           "additionalProperties": false,
@@ -5393,485 +5455,6 @@
           "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "sonarqube": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "database": true,
-            "ingress": true,
-            "sso": true
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "fortify": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "externalDatabase": {
-              "type": "object",
-              "properties": {
-                "host": {
-                  "type": "string",
-                  "default": "",
-                  "description": "External MySQL host used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
-                },
-                "port": {
-                  "type": [
-                    "integer",
-                    "string"
-                  ],
-                  "default": 3306,
-                  "description": "External MySQL port used to generate Fortify's outbound bb-common route/ServiceEntry when values.mysql.enabled=false."
-                }
-              }
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "ingress": true
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "anchoreEnterprise": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "adminPassword": true,
-            "database": true,
-            "enterprise": true,
-            "ingress": true,
-            "redis": true,
-            "sso": true
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "mattermostOperator": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            }
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "mattermost": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "database": true,
-            "elasticsearch": true,
-            "enterprise": true,
-            "ingress": true,
-            "objectStorage": true,
-            "sso": true
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "velero": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            }
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "keycloak": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "database": true,
-            "ingress": true
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "vault": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "ingress": {
-              "type": "object",
-              "properties": {
-                "gateway": {
-                  "type": "string"
-                },
-                "cert": {
-                  "type": "string"
-                },
-                "key": {
-                  "type": "string"
-                }
-              },
-              "additionalProperties": false
-            },
-            "kms_access_key": {
-              "type": "string"
-            },
-            "kms_secret_key": {
-              "type": "string"
-            },
-            "kms_key_id": {
-              "type": "string"
-            }
-          },
-          "type": "object",
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "metricsServer": {
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "type": [
-                "boolean",
-                "string"
-              ],
-              "enum": [
-                true,
-                false,
-                "auto"
-              ],
-              "examples": [
-                true,
-                false,
-                "auto"
-              ]
-            },
-            "sourceType": {
-              "$ref": "#/$defs/packageAliasPartials/sourceType"
-            },
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "automountServiceAccountToken": {
-              "type": "boolean"
-            },
-            "namespace": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string",
-                  "default": "kube-system"
-                },
-                "create": {
-                  "type": "boolean",
-                  "default": false
-                },
-                "labels": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "default": {}
-                },
-                "annotations": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "default": {}
-                }
-              },
-              "additionalProperties": false
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "istio": {
-              "$ref": "#/$defs/packageAliasPartials/istio"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            }
-          },
-          "additionalProperties": false,
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
         "harbor": {
           "allOf": [
             {
@@ -5961,7 +5544,7 @@
           "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "thanos": {
+        "keycloak": {
           "allOf": [
             {
               "$ref": "#/$defs/packageAliasPartials/basePackage"
@@ -5999,21 +5582,19 @@
             "istio": {
               "$ref": "#/$defs/packageAliasPartials/istio"
             },
-            "ingress": true,
-            "objectStorage": true,
-            "sso": true
+            "database": true,
+            "ingress": true
           },
           "type": "object",
           "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
         },
-        "externalSecrets": {
+        "mattermost": {
           "allOf": [
             {
               "$ref": "#/$defs/packageAliasPartials/basePackage"
             }
           ],
-          "type": "object",
           "properties": {
             "git": {
               "$ref": "#/$defs/packageAliasPartials/git"
@@ -6043,7 +5624,134 @@
             "postRenderers": {
               "$ref": "#/$defs/packageAliasPartials/postRenderers"
             },
-            "ingress": true
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "database": true,
+            "elasticsearch": true,
+            "enterprise": true,
+            "ingress": true,
+            "objectStorage": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "mattermostOperator": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "metricsServer": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": [
+                "boolean",
+                "string"
+              ],
+              "enum": [
+                true,
+                false,
+                "auto"
+              ],
+              "examples": [
+                true,
+                false,
+                "auto"
+              ]
+            },
+            "sourceType": {
+              "$ref": "#/$defs/packageAliasPartials/sourceType"
+            },
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "automountServiceAccountToken": {
+              "type": "boolean"
+            },
+            "namespace": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "default": "kube-system"
+                },
+                "create": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "labels": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                },
+                "annotations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {}
+                }
+              },
+              "additionalProperties": false
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            }
           },
           "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
@@ -6090,6 +5798,298 @@
             "s3ObjectStorage": true,
             "serviceAccountAnnotations": true
           },
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "minio": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "accesskey": true,
+            "ingress": true,
+            "secretkey": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "minioOperator": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "sonarqube": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "database": true,
+            "ingress": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "thanos": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": true,
+            "objectStorage": true,
+            "sso": true
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "vault": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            },
+            "ingress": {
+              "type": "object",
+              "properties": {
+                "gateway": {
+                  "type": "string"
+                },
+                "cert": {
+                  "type": "string"
+                },
+                "key": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            },
+            "kms_access_key": {
+              "type": "string"
+            },
+            "kms_secret_key": {
+              "type": "string"
+            },
+            "kms_key_id": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Partial override merged over the built-in package's legacy defaults."
+        },
+        "velero": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/packageAliasPartials/basePackage"
+            }
+          ],
+          "properties": {
+            "git": {
+              "$ref": "#/$defs/packageAliasPartials/git"
+            },
+            "helmRepo": {
+              "$ref": "#/$defs/packageAliasPartials/helmRepo"
+            },
+            "enabled": {
+              "$ref": "#/$defs/packageAliasPartials/enabled"
+            },
+            "sourceType": {
+              "enum": [
+                "git",
+                "helmRepo"
+              ]
+            },
+            "releaseName": {
+              "type": "string",
+              "description": "Optional Helm releaseName override for this package."
+            },
+            "flux": {
+              "$ref": "#/$defs/packageAliasPartials/flux"
+            },
+            "values": {
+              "$ref": "#/$defs/packageAliasPartials/values"
+            },
+            "postRenderers": {
+              "$ref": "#/$defs/packageAliasPartials/postRenderers"
+            },
+            "istio": {
+              "$ref": "#/$defs/packageAliasPartials/istio"
+            }
+          },
+          "type": "object",
           "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
         }
@@ -6545,8 +6545,32 @@
         "additionalProperties": false
       },
       "properties": {
+        "alloy": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/alloy"
+        },
+        "bbctl": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/bbctl"
+        },
         "certManager": {
           "$ref": "#/$defs/packageAliasPartials/aliases/certManager"
+        },
+        "eckOperator": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/eckOperator"
+        },
+        "elasticsearchKibana": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/elasticsearchKibana"
+        },
+        "fluentbit": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/fluentbit"
+        },
+        "gatekeeper": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/gatekeeper"
+        },
+        "gatewayAPI": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/gatewayAPI"
+        },
+        "grafana": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/grafana"
         },
         "istioCNI": {
           "$ref": "#/$defs/packageAliasPartials/aliases/istioCNI"
@@ -6554,23 +6578,14 @@
         "istioCRDs": {
           "$ref": "#/$defs/packageAliasPartials/aliases/istioCRDs"
         },
-        "gatewayAPI": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/gatewayAPI"
-        },
         "istiod": {
           "$ref": "#/$defs/packageAliasPartials/aliases/istiod"
         },
         "istioGateway": {
           "$ref": "#/$defs/packageAliasPartials/aliases/istioGateway"
         },
-        "ztunnel": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/ztunnel"
-        },
         "kiali": {
           "$ref": "#/$defs/packageAliasPartials/aliases/kiali"
-        },
-        "gatekeeper": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/gatekeeper"
         },
         "kyverno": {
           "$ref": "#/$defs/packageAliasPartials/aliases/kyverno"
@@ -6581,44 +6596,32 @@
         "kyvernoReporter": {
           "$ref": "#/$defs/packageAliasPartials/aliases/kyvernoReporter"
         },
-        "elasticsearchKibana": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/elasticsearchKibana"
-        },
-        "eckOperator": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/eckOperator"
-        },
-        "fluentbit": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/fluentbit"
-        },
-        "alloy": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/alloy"
-        },
         "loki": {
           "$ref": "#/$defs/packageAliasPartials/aliases/loki"
-        },
-        "neuvector": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/neuvector"
-        },
-        "tempo": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/tempo"
-        },
-        "prometheusOperatorCRDs": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/prometheusOperatorCRDs"
         },
         "monitoring": {
           "$ref": "#/$defs/packageAliasPartials/aliases/monitoring"
         },
-        "grafana": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/grafana"
+        "neuvector": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/neuvector"
+        },
+        "prometheusOperatorCRDs": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/prometheusOperatorCRDs"
+        },
+        "renovate": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/renovate"
+        },
+        "tempo": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/tempo"
         },
         "twistlock": {
           "$ref": "#/$defs/packageAliasPartials/aliases/twistlock"
         },
-        "bbctl": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/bbctl"
+        "ztunnel": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/ztunnel"
         },
-        "renovate": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/renovate"
+        "anchoreEnterprise": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/anchoreEnterprise"
         },
         "argocd": {
           "$ref": "#/$defs/packageAliasPartials/aliases/argocd"
@@ -6626,11 +6629,11 @@
         "authservice": {
           "$ref": "#/$defs/packageAliasPartials/aliases/authservice"
         },
-        "minioOperator": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/minioOperator"
+        "externalSecrets": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/externalSecrets"
         },
-        "minio": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/minio"
+        "fortify": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/fortify"
         },
         "gitlab": {
           "$ref": "#/$defs/packageAliasPartials/aliases/gitlab"
@@ -6638,47 +6641,44 @@
         "gitlabRunner": {
           "$ref": "#/$defs/packageAliasPartials/aliases/gitlabRunner"
         },
-        "sonarqube": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/sonarqube"
-        },
-        "fortify": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/fortify"
-        },
-        "anchoreEnterprise": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/anchoreEnterprise"
-        },
-        "mattermostOperator": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/mattermostOperator"
-        },
-        "mattermost": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/mattermost"
-        },
-        "velero": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/velero"
-        },
-        "keycloak": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/keycloak"
-        },
-        "vault": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/vault"
-        },
-        "metricsServer": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/metricsServer"
-        },
         "harbor": {
           "$ref": "#/$defs/packageAliasPartials/aliases/harbor"
         },
         "headlamp": {
           "$ref": "#/$defs/packageAliasPartials/aliases/headlamp"
         },
-        "thanos": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/thanos"
+        "keycloak": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/keycloak"
         },
-        "externalSecrets": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/externalSecrets"
+        "mattermost": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/mattermost"
+        },
+        "mattermostOperator": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/mattermostOperator"
+        },
+        "metricsServer": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/metricsServer"
         },
         "mimir": {
           "$ref": "#/$defs/packageAliasPartials/aliases/mimir"
+        },
+        "minio": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/minio"
+        },
+        "minioOperator": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/minioOperator"
+        },
+        "sonarqube": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/sonarqube"
+        },
+        "thanos": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/thanos"
+        },
+        "vault": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/vault"
+        },
+        "velero": {
+          "$ref": "#/$defs/packageAliasPartials/aliases/velero"
         }
       }
     }

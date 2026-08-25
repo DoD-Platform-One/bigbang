@@ -1,4 +1,4 @@
-# Argocd
+# Argo CD
 
 ## Overview
 
