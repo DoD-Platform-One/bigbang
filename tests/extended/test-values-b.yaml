@@ -1,5 +1,8 @@
+# Disabled: the twistlock console OOMKills at the chart's memory limit while
+# importing its CVE feed, leaving the package permanently non-functional in CI.
+# Re-enable once a twistlock release fixes the console's memory consumption.
 twistlock:
-  enabled: true
+  enabled: false
 renovate:
   enabled: true
 
