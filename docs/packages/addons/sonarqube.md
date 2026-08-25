@@ -121,5 +121,26 @@ Sonarqube is released under the [Lesser GNU General Public License](https://en.w
 
 ## Dependencies
 
-Node kernel mods:
-<https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/guides/prerequisites/os_preconfiguration.md#sonarqube-specific-configuration-sonarqube-is-a-bb-addon-app>
+### Node kernel requirements
+
+SonarQube uses an embedded Elasticsearch instance and requires the following minimum settings on every Linux node where its pod can be scheduled:
+
+| Setting | Minimum value |
+| --- | ---: |
+| `vm.max_map_count` | 524288 |
+| `fs.file-max` | 131072 |
+| Open file descriptors for the SonarQube user (`ulimit -n`) | 131072 |
+| Threads available to the SonarQube user (`ulimit -u`) | 8192 |
+
+Configure these settings through your node operating system or cluster provisioning workflow before deploying SonarQube. Avoid changing node-level settings from a privileged application init container.
+
+Verify the settings on each eligible node:
+
+```shell
+sysctl vm.max_map_count
+sysctl fs.file-max
+ulimit -n
+ulimit -u
+```
+
+See the [SonarQube Linux host configuration](https://docs.sonarsource.com/sonarqube-server/2026.1/server-installation/pre-installation/linux) documentation for configuration instructions and additional requirements.
