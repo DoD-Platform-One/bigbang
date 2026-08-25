@@ -27,8 +27,8 @@ Contact the Big Bang Government Team Lead to request access.
 
 ### Deploy a k8s cluster and install flux
 
-by default the easiest way to test is to spin up a cluster using the k3d-dev.sh script.
-you can follow the directions <https://repo1.dso.mil/big-bang/bigbang/-/blob/master/docs/developer/aws-k3d-script.md>
+By default, the easiest way to test is to spin up a cluster using the `k3d-dev.sh` script.
+Follow the [AWS k3d development environment instructions](aws-k3d-script.md).
 
 ### Deploy Big Bang
 
