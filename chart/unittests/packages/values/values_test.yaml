@@ -8,7 +8,6 @@ templates:
   - templates/anchore-enterprise/values.yaml
   - templates/argocd/values.yaml
   - templates/authservice/values.yaml
-  - templates/bbctl/values.yaml
   - templates/eck-operator/values.yaml
   - templates/fluentbit/values.yaml
   - templates/fortify/values.yaml

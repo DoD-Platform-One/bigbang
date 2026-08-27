@@ -54,13 +54,6 @@ loki:
   dependencies:
     - "minioOperator"
     - "alloy"
-bbctl:
-  repoName: "bbctl"
-  dependencies:
-    - "loki"
-    - "grafana"
-    - "alloy"
-    - "monitoring"
 minioOperator:
   repoName: "minio-operator"
   hrName: "minio-operator"

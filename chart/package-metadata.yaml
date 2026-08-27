@@ -6,12 +6,6 @@ packages:
     legacyPath: alloy
     templateDirectory: alloy
     documentation: docs/packages/core/alloy.md
-  bbctl:
-    displayName: BBCTL
-    category: core
-    legacyPath: bbctl
-    templateDirectory: bbctl
-    documentation: docs/packages/core/bbctl.md
   certManager:
     displayName: cert-manager
     category: core

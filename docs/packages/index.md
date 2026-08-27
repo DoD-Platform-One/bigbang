@@ -15,7 +15,6 @@ Core packages provide the platform capabilities that other packages commonly dep
 | Package | Canonical configuration | Big Bang integration | Package source |
 | --- | --- | --- | --- |
 | Alloy | `packages.alloy` | [Guide](core/alloy.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/alloy) |
-| BBCTL | `packages.bbctl` | [Guide](core/bbctl.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/bbctl) |
 | cert-manager | `packages.certManager` | [Guide](core/cert-manager.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/cert-manager) |
 | ECK Operator | `packages.eckOperator` | [Guide](core/elasticsearch-kibana.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/eck-operator) |
 | Elasticsearch Kibana | `packages.elasticsearchKibana` | [Guide](core/elasticsearch-kibana.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana) |
