@@ -1060,6 +1060,8 @@ Usage: {{- if eq (include "metricsSidecarMtls" (list .Values.loki .)) "true" }}
 {{- if eq (include "ambientEnabled" .) "true" }}
 - name: ztunnel
   namespace: {{ .Release.Namespace }}
+- name: gateway-api
+  namespace: {{ .Release.Namespace }}
 {{- end }}
 {{- end -}}
 

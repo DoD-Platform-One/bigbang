@@ -824,7 +824,7 @@ tests:
       path: metadata.name
       value: gateway-api
 
-- it: other Istio-integrated packages should not depend on gateway-api in ambient mode
+- it: Istio-integrated packages should depend on gateway-api in ambient mode
   set:
     istio:
       ambient:
@@ -833,7 +833,7 @@ tests:
       enabled: true
   template: monitoring/helmrelease.yaml
   asserts:
-  - notContains:
+  - contains:
       path: spec.dependsOn
       content:
         name: gateway-api
