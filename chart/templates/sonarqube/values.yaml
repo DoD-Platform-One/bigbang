@@ -130,11 +130,6 @@ bbtests:
       cypress_url: {{ printf "https://sonarqube.%s" $domainName | quote }}
       cypress_url_setup: {{ printf "https://sonarqube.%s/setup" $domainName | quote }}
 
-{{- if $istioEnabled }}
-annotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
-
 {{- if $localSSOEnabled }}
 sso:
   idpmetadataurl: {{ include "sso.saml.service" . }}/descriptor
@@ -149,7 +144,11 @@ upstream:
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsPullSecretsWithName" . | nindent 4 }}
-  
+  {{- if $istioEnabled }}
+  annotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
+
 {{- if .Values.addons.sonarqube.sso.enabled }}
   sonarProperties:
     # enabling saml authentication 

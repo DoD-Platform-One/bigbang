@@ -1,0 +1,20 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Fluentbit - Istio Annotation Routing
+templates:
+  - templates/fluentbit/values.yaml
+tests:
+  - it: should render the istio roll annotation on the upstream pod template
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      fluentbit.enabled: true
+      istio.ambient.enabled: true
+    asserts:
+      - equal:
+          path: upstream.podAnnotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - isNull:
+          path: podAnnotations

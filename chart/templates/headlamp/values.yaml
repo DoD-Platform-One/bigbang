@@ -101,11 +101,6 @@ bbtests:
 
 domain: {{ $domainName }}
 
-{{- if (eq (include "istioEnabled" .) "true") }}
-annotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
-
 openshift: {{ .Values.openshift }}
 
 upstream:
@@ -113,6 +108,10 @@ upstream:
     pullPolicy: {{ .Values.imagePullPolicy }}
 
   {{- include "secretsImagePullSecretsWithName" . | nindent 2 }}
+  {{- if (eq (include "istioEnabled" .) "true") }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
 
   config:
     {{- if .Values.addons.headlamp.sso.enabled }}

@@ -21,11 +21,6 @@
 
 domain: {{ $domainName }}
 
-{{- if $istioEnabled }}
-podAnnotations:
-  {{ include "istioAnnotation" . }}
-{{- end }}
-
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
@@ -90,6 +85,10 @@ bbtests:
 openshift: {{ .Values.openshift }}
 
 upstream:
+  {{- if $istioEnabled }}
+  podAnnotations:
+    {{ include "istioAnnotation" . }}
+  {{- end }}
   image:
     pullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecrets" . | nindent 4 }}

@@ -136,7 +136,7 @@ upstream:
 
   {{- if $istioEnabled }}
   podAnnotations:
-    {{ include "istioAnnotation" . | nindent 2 }}
+    {{ include "istioAnnotation" . }}
   {{- end }}
 
   {{- if .Values.kiali.enabled }}

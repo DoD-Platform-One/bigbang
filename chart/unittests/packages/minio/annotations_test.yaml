@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - MinIO - Istio Annotation Routing
+templates:
+  - templates/minio/values.yaml
+tests:
+  - it: should render the istio roll annotation on the tenant pool metadata
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.minio.enabled: true
+      istio.ambient.enabled: true
+    asserts:
+      - equal:
+          path: upstream.tenant.poolsMetadata.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
