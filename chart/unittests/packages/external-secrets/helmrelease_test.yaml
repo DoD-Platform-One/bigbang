@@ -1,0 +1,107 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Packages - external-secrets - HelmRelease Tests
+templates:
+  - templates/external-secrets/helmrelease.yaml
+  - templates/external-secrets/values.yaml
+tests:
+  - it: renders with values omitted and Istio disabled
+    template: external-secrets/helmrelease.yaml
+    set:
+      istio.enabled: false
+      istiod.enabled: false
+      addons:
+        externalSecrets:
+          enabled: true
+    asserts:
+      - equal:
+          path: metadata.name
+          value: external-secrets
+      - notExists:
+          path: spec.postRenderers
+
+  - it: renders with empty values and Istio disabled
+    template: external-secrets/helmrelease.yaml
+    set:
+      istio.enabled: false
+      istiod.enabled: false
+      addons:
+        externalSecrets:
+          enabled: true
+          values: {}
+    asserts:
+      - equal:
+          path: metadata.name
+          value: external-secrets
+      - notExists:
+          path: spec.postRenderers
+
+  - it: does not create an Istio post-renderer when the webhook is disabled
+    template: external-secrets/helmrelease.yaml
+    set:
+      istio.enabled: true
+      istiod.enabled: true
+      addons:
+        externalSecrets:
+          enabled: true
+          values:
+            upstream:
+              webhook:
+                create: false
+    asserts:
+      - equal:
+          path: metadata.name
+          value: external-secrets
+      - notExists:
+          path: spec.postRenderers
+
+  - it: creates an Istio post-renderer when the webhook is enabled
+    template: external-secrets/helmrelease.yaml
+    set:
+      istio.enabled: true
+      istiod.enabled: true
+      addons:
+        externalSecrets:
+          enabled: true
+          values:
+            upstream:
+              webhook:
+                create: true
+    asserts:
+      - exists:
+          path: spec.postRenderers
+      - matchRegex:
+          path: spec.postRenderers[0].kustomize.patches[0].patch
+          pattern: "appProtocol"
+
+  - it: preserves custom post-renderers without Istio
+    template: external-secrets/helmrelease.yaml
+    set:
+      istio.enabled: false
+      istiod.enabled: false
+      addons:
+        externalSecrets:
+          enabled: true
+          postRenderers:
+            - kustomize:
+                patches:
+                  - patch: "- op: add\\n  path: /metadata/labels/example\\n  value: test"
+                    target:
+                      kind: Deployment
+                      name: external-secrets
+    asserts:
+      - exists:
+          path: spec.postRenderers
+
+  - it: renders defaults with the webhook disabled
+    template: external-secrets/values.yaml
+    set:
+      istio.enabled: true
+      istiod.enabled: true
+      addons:
+        externalSecrets:
+          enabled: true
+          values: {}
+    asserts:
+      - matchRegex:
+          path: stringData.defaults
+          pattern: "kubeAPI: false"
