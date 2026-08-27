@@ -30,7 +30,7 @@ tests:
   - contains:
       path: spec.dependsOn
       content:
-        name: monitoring
+        name: prometheus-operator-crds
         namespace: NAMESPACE
   - equal:
       path: spec.postRenderers[0].kustomize.patches[0].target.kind
@@ -41,6 +41,11 @@ tests:
   - matchRegex:
       path: spec.postRenderers[0].kustomize.patches[0].patch
       pattern: "(?s).*remove.*tlsConfig.*"
+  - notContains:
+      path: spec.dependsOn
+      content:
+        name: monitoring
+        namespace: NAMESPACE
 
 - it: should not render cert-manager HelmRelease when disabled
   set:
@@ -115,6 +120,8 @@ tests:
   set:
     monitoring:
       enabled: true
+    certManager:
+      enabled: true
   template: monitoring/helmrelease.yaml
   asserts:
   - isKind:
@@ -122,6 +129,37 @@ tests:
   - equal:
       path: metadata.name
       value: monitoring
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: cert-manager
+        namespace: NAMESPACE
+
+- it: should use the enabled cert-manager default for monitoring dependency ordering
+  set:
+    monitoring:
+      enabled: true
+  template: monitoring/helmrelease.yaml
+  asserts:
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: cert-manager
+        namespace: NAMESPACE
+
+- it: should omit the cert-manager dependency when cert-manager is disabled
+  set:
+    monitoring:
+      enabled: true
+    certManager:
+      enabled: false
+  template: monitoring/helmrelease.yaml
+  asserts:
+  - notContains:
+      path: spec.dependsOn
+      content:
+        name: cert-manager
+        namespace: NAMESPACE
 
 - it: should not render monitoring HelmRelease when disabled
   set:

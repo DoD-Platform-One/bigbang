@@ -33,6 +33,10 @@ spec:
   dependsOn:
     - name: prometheus-operator-crds
       namespace: {{ .Release.Namespace }}
+  {{- if .Values.certManager.enabled }}
+    - name: cert-manager
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
   {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.addons.vault.enabled }}
   {{- if $istioEnabled }}
     {{- include "istioHelmReleases" . | nindent 4 }}
