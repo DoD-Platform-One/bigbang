@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Anchore Enterprise - Istio Annotation Routing
+templates:
+  - templates/anchore-enterprise/values.yaml
+tests:
+  - it: should render the istio roll annotation on the internal postgres pod templates
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.anchoreEnterprise.enabled: true
+      istio.ambient.enabled: true
+    asserts:
+      - equal:
+          path: postgresql.primary.podAnnotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: postgresql.readReplicas.podAnnotations["bigbang.dev/istioDataplane"]
+          value: ambient
+
+  - it: should render the istio roll annotation on every enterprise service pod template
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.anchoreEnterprise.enabled: true
+      istio.ambient.enabled: true
+    asserts:
+      - equal:
+          path: upstream.analyzer.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.api.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.catalog.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.dataSyncer.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.notifications.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.policyEngine.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.reports.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.reportsWorker.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.simpleQueue.annotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.ui.annotations["bigbang.dev/istioDataplane"]
+          value: ambient

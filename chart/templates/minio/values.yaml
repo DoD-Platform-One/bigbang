@@ -80,6 +80,11 @@ monitoring:
 upstream:
   tenant:
     name: minio-minio-minio-instance
+    {{- if $istioEnabled }}
+    poolsMetadata:
+      annotations:
+        {{ include "istioAnnotation" . }}
+    {{- end }}
     image:
       pullPolicy: {{ .Values.imagePullPolicy }}
     {{- include "secretsImagePullSecretWithName" . | nindent 4 }}

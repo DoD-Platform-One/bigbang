@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - External Secrets - Istio Annotation Routing
+templates:
+  - templates/external-secrets/values.yaml
+tests:
+  - it: should render the istio roll annotation on the upstream pod template
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.externalSecrets.enabled: true
+      istio.ambient.enabled: true
+      addons.externalSecrets.values.upstream.webhook.create: true
+      addons.externalSecrets.values.upstream.certController.create: true
+    asserts:
+      - equal:
+          path: upstream.podAnnotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.webhook.podAnnotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - equal:
+          path: upstream.certController.podAnnotations["bigbang.dev/istioDataplane"]
+          value: ambient
+      - isNull:
+          path: annotations

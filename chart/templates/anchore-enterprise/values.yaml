@@ -250,10 +250,10 @@ postgresql:
     enablePostgresUser: true
   {{- if $istioEnabled }}
   primary:
-    annotations:
+    podAnnotations:
       {{- include "istioAnnotation" . | nindent 6 }}
   readReplicas:
-    annotations:
+    podAnnotations:
       {{- include "istioAnnotation" . | nindent 6 }}
   {{- end }}
   {{- end }}
@@ -300,6 +300,9 @@ upstream:
     {{- with dig "upstream" "reports" "annotations" dict .Values.addons.anchoreEnterprise.values }}
       {{ toYaml . | nindent 6}}
     {{- end }}
+    {{- if $istioEnabled }}
+      {{ include "istioAnnotation" . }}
+    {{- end }}
     {{- if eq (include "ambientEnabled" .) "false" }}
       traffic.sidecar.istio.io/excludeInboundPorts: "8558"
     {{- end }}
@@ -310,6 +313,9 @@ upstream:
     annotations:
     {{- with dig "upstream" "api" "annotations" dict .Values.addons.anchoreEnterprise.values }}
       {{ toYaml . | nindent 6}}
+    {{- end }}
+    {{- if $istioEnabled }}
+      {{ include "istioAnnotation" . }}
     {{- end }}
     {{- if eq (include "ambientEnabled" .) "false" }}
       traffic.sidecar.istio.io/excludeOutboundPorts: "8558"
@@ -322,6 +328,34 @@ upstream:
     {{- else }}
     imagePullSecretName: ""
     {{- end }}
+    {{- if $istioEnabled }}
+    annotations:
+      {{ include "istioAnnotation" . }}
+    {{- end }}
+
+  {{- if $istioEnabled }}
+  analyzer:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  catalog:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  dataSyncer:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  notifications:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  policyEngine:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  reportsWorker:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  simpleQueue:
+    annotations:
+      {{ include "istioAnnotation" . }}
+  {{- end }}
 
 ui-redis:
   {{- if $externalRedisEnabled }}
