@@ -1147,11 +1147,11 @@ monitoring:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/monitoring.git
     path: "./chart"
-    tag: "88.3.0-bb.0"
+    tag: "88.3.0-bb.1"
   helmRepo:
     repoName: "registry1"
     chartName: "monitoring"
-    tag: "88.3.0-bb.0"
+    tag: "88.3.0-bb.1"
 
   # -- Flux reconciliation overrides specifically for the Monitoring Package
   flux:
@@ -1338,7 +1338,7 @@ renovate:
 # -- cert-manager package configuration.
 certManager:
   # -- Toggle deployment of cert-manager
-  enabled: false
+  enabled: true
 
   # -- Choose source type of "git" or "helmRepo"
   sourceType: "git"

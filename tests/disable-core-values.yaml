@@ -3,6 +3,8 @@
 #########################
 monitoring:
   enabled: false
+certManager:
+  enabled: false
 grafana:
   enabled: false
 neuvector:
