@@ -36,6 +36,8 @@ tests:
               namespace: bigbang
             - name: ztunnel
               namespace: bigbang
+            - name: gateway-api
+              namespace: bigbang
 
   - it: waits for the ambient mesh before installing the CloudNativePG operator
     template: package/helmrelease.yaml
