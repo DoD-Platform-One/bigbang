@@ -2,7 +2,7 @@
 
 ## Overview
 
-[NeuVector](https://neuvector.com/) is an open-source, full lifecycle container security platform. This includes vulnerability scanning (both in pipelines and in live production clusters), network visibility, compliance tracking and much more. [NeuVector core helm chart](https://github.com/neuvector/neuvector-helm/tree/master/charts/core)
+[NeuVector](https://open-docs.neuvector.com/) is an open-source, full lifecycle container security platform. This includes vulnerability scanning (both in pipelines and in live production clusters), network visibility, compliance tracking and much more. [NeuVector core helm chart](https://github.com/neuvector/neuvector-helm/tree/master/charts/core)
 
 [NeuVector Architecture](https://open-docs.neuvector.com/basics/overview#architecture)
 
