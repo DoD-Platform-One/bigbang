@@ -150,7 +150,7 @@ scripts/generate-values-reference.sh --check
 ### Generate Integrated Package Metadata
 
 Changes to `chart/package-metadata.yaml` require regenerating the package-derived
-schema, migration metadata, and documentation artifacts.
+schema and migration metadata.
 
 After changing integrated package metadata, run:
 
@@ -158,13 +158,9 @@ After changing integrated package metadata, run:
 scripts/generate-package-schemas.sh --write
 ```
 
-To validate the metadata and confirm that all generated artifacts are current,
+To validate the metadata and confirm that the generated files are current,
 run:
 
 ```shell
 scripts/generate-package-schemas.sh --check
 ```
-
-For the package integration documentation workflow and ownership of generated
-navigation files, see
-[Package Integration Pages](./docs/README.md#package-integration-pages).
