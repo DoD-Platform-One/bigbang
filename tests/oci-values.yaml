@@ -37,11 +37,6 @@ alloy:
   helmRepo:
     cosignVerify: false
 
-bbctl:
-  sourceType: "helmRepo"
-  helmRepo:
-    cosignVerify: false
-
 kiali:
   sourceType: "helmRepo"
   helmRepo:

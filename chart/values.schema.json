@@ -32,7 +32,6 @@
     "monitoring",
     "grafana",
     "twistlock",
-    "bbctl",
     "renovate",
     "certManager",
     "addons"
@@ -971,62 +970,6 @@
             }
           },
           "additionalProperties": false
-        }
-      },
-      "additionalProperties": false
-    },
-    "bbctl": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/basePackage"
-        }
-      ],
-      "properties": {
-        "enabled": true,
-        "sourceType": true,
-        "releaseName": true,
-        "git": true,
-        "helmRepo": true,
-        "flux": true,
-        "values": true,
-        "postRenderers": true,
-        "registryOverrides": {
-          "description": "List of docker image registry hostnames to use in commands that deploy images.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "preflightCheck": {
-          "description": "Configuration values specific to the preflight-check command.",
-          "type": "object",
-          "properties": {
-            "image": {
-              "description": "Image name including tag to deploy as the preflight check pod.",
-              "type": "string"
-            }
-          }
-        },
-        "repoCredentials": {
-          "type": "object",
-          "items": {
-            "repo": {
-              "description": "Hostname of the source code repository website.",
-              "type": "string"
-            },
-            "username": {
-              "description": "Username used to acess the repository. Only required when using a private repository.",
-              "type": "string"
-            },
-            "password": {
-              "description": "Password or API token used to acess the repository. Only required when using a private repository.",
-              "type": "string"
-            },
-            "email": {
-              "description": "Email address associated with the given repository credentials. Only required when using a private repository.",
-              "type": "string"
-            }
-          }
         }
       },
       "additionalProperties": false
@@ -3659,84 +3602,6 @@
             },
             "istio": {
               "$ref": "#/$defs/packageAliasPartials/istio"
-            }
-          },
-          "additionalProperties": false,
-          "type": "object",
-          "description": "Partial override merged over the built-in package's legacy defaults."
-        },
-        "bbctl": {
-          "allOf": [
-            {
-              "$ref": "#/$defs/packageAliasPartials/basePackage"
-            }
-          ],
-          "properties": {
-            "git": {
-              "$ref": "#/$defs/packageAliasPartials/git"
-            },
-            "helmRepo": {
-              "$ref": "#/$defs/packageAliasPartials/helmRepo"
-            },
-            "enabled": {
-              "$ref": "#/$defs/packageAliasPartials/enabled"
-            },
-            "sourceType": {
-              "enum": [
-                "git",
-                "helmRepo"
-              ]
-            },
-            "releaseName": {
-              "type": "string",
-              "description": "Optional Helm releaseName override for this package."
-            },
-            "flux": {
-              "$ref": "#/$defs/packageAliasPartials/flux"
-            },
-            "values": {
-              "$ref": "#/$defs/packageAliasPartials/values"
-            },
-            "postRenderers": {
-              "$ref": "#/$defs/packageAliasPartials/postRenderers"
-            },
-            "registryOverrides": {
-              "description": "List of docker image registry hostnames to use in commands that deploy images.",
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "preflightCheck": {
-              "description": "Configuration values specific to the preflight-check command.",
-              "type": "object",
-              "properties": {
-                "image": {
-                  "description": "Image name including tag to deploy as the preflight check pod.",
-                  "type": "string"
-                }
-              }
-            },
-            "repoCredentials": {
-              "type": "object",
-              "items": {
-                "repo": {
-                  "description": "Hostname of the source code repository website.",
-                  "type": "string"
-                },
-                "username": {
-                  "description": "Username used to acess the repository. Only required when using a private repository.",
-                  "type": "string"
-                },
-                "password": {
-                  "description": "Password or API token used to acess the repository. Only required when using a private repository.",
-                  "type": "string"
-                },
-                "email": {
-                  "description": "Email address associated with the given repository credentials. Only required when using a private repository.",
-                  "type": "string"
-                }
-              }
             }
           },
           "additionalProperties": false,
@@ -6547,9 +6412,6 @@
       "properties": {
         "alloy": {
           "$ref": "#/$defs/packageAliasPartials/aliases/alloy"
-        },
-        "bbctl": {
-          "$ref": "#/$defs/packageAliasPartials/aliases/bbctl"
         },
         "certManager": {
           "$ref": "#/$defs/packageAliasPartials/aliases/certManager"

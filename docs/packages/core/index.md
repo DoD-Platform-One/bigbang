@@ -9,7 +9,6 @@ Use the integration guide for Big Bang-specific behavior. Use the package reposi
 | Package | Canonical configuration | Big Bang integration | Package source |
 | --- | --- | --- | --- |
 | Alloy | `packages.alloy` | [Guide](alloy.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/alloy) |
-| BBCTL | `packages.bbctl` | [Guide](bbctl.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/bbctl) |
 | cert-manager | `packages.certManager` | [Guide](cert-manager.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/cert-manager) |
 | ECK Operator | `packages.eckOperator` | [Guide](elasticsearch-kibana.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/eck-operator) |
 | Elasticsearch Kibana | `packages.elasticsearchKibana` | [Guide](elasticsearch-kibana.md) | [Repository](https://repo1.dso.mil/big-bang/product/packages/elasticsearch-kibana) |

@@ -1,6 +1,5 @@
 nav:
   - Overview: index.md
-  - "BBCTL": bbctl.md
   - "cert-manager": cert-manager.md
   - "Elasticsearch-Kibana": elasticsearch-kibana.md
   - "Fluent Bit": fluentbit.md

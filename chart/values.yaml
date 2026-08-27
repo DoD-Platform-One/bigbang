@@ -1306,47 +1306,6 @@ twistlock:
   postRenderers: []
 # ----------------------------------------------------------------------------------------------------------------------
 
-# ----------------------------------------------------------------------------------------------------------------------
-# BBCTL Dashboards
-#
-# Requires monitoring, grafana, alloy, and loki to be deployed
-# -- BBCTL package configuration.
-bbctl:
-  # -- Toggle deployment of the bbctl dashboards
-  enabled: true
-
-  sourceType: "git"
-
-  git:
-    repo: https://repo1.dso.mil/big-bang/product/packages/bbctl.git
-    tag: "3.0.1-bb.3"
-    path: "./chart"
-  helmRepo:
-    repoName: "registry1"
-    chartName: "bbctl"
-    tag: "3.0.1-bb.3"
-
-  repoCredentials:
-    repo: "repo1.dso.mil"
-    username: ""
-    password: ""
-    email: ""
-
-  # List of docker image registry hostnames to use in commands that deploy images
-  # Defaults to ["registry1.dso.mil"] if empty
-  registryOverrides: []
-  # Image name including tag to use for the preflight check pod
-  # Defaults to "registry1.dso.mil/ironbank/redhat/ubi/ubi9-minimal:9.6" if empty
-  preflightCheck:
-    image: ""
-
-  # -- Override flux settings for this package
-  flux: {}
-
-  values: {}
-
-  postRenderers: []
-
 renovate:
   # -- Toggle deployment of Renovate
   enabled: false

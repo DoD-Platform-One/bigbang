@@ -111,8 +111,6 @@ kyvernoPolicies:
 #########################
 # Disable Core Packages #
 #########################
-bbctl:
-  enabled: false
 renovate:
   enabled: false
 monitoring:

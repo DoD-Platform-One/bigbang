@@ -852,7 +852,6 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
-              - bbctl
               - gitlab
               - gitlab-runner
               - kiali
@@ -893,7 +892,6 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
-              - bbctl
               - gitlab
               - gitlab-runner
               - kiali
@@ -941,7 +939,6 @@ kyvernoPolicies:
           - resources:
               namespaces:
               - anchore
-              - bbctl
               - gitlab
               - gitlab-runner
               - kiali
@@ -1331,12 +1328,6 @@ twistlock:
     defender:
       dockerSocket: "/run/k3s/containerd/containerd.sock"
       selinux: false
-    bbtests:
-      enabled: true
-
-bbctl:
-  enabled: true
-  values:
     bbtests:
       enabled: true
 
