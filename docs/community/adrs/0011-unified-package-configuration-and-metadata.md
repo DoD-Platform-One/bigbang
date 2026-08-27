@@ -14,7 +14,7 @@ The split makes `values.yaml` difficult to scan and makes automation harder beca
 
 Moving the existing paths immediately would make otherwise valid 3.x deployment values fail. Big Bang 4.x is the appropriate release for removing those paths, but users need a migration period and an automated way to update their values before that breaking release.
 
-The chart also repeats package identity in several places: Helm templates, schema properties, documentation navigation, compatibility lists, and migration tooling. A repository-owned package metadata catalog can become the source for those generated views without exposing implementation metadata as user-configurable Helm values.
+The chart also repeats package identity in several places: Helm templates, schema properties, compatibility lists, and migration tooling. A repository-owned package metadata catalog can become the source for those generated views without exposing implementation metadata as user-configurable Helm values.
 
 This ADR refines ADR 3. It retains the single package mapping decision but supersedes ADR 3's proposed `additionalPackages` mapping. Built-in and user-supplied packages will coexist under `packages` because both are packages and their names must already be unique within one Big Bang release.
 
@@ -44,24 +44,21 @@ packages:
     category: core
     legacyPath: monitoring
     templateDirectory: monitoring
-    documentation: docs/packages/core/monitoring.md
   gitlab:
     displayName: GitLab
     category: addon
     legacyPath: addons.gitlab
     templateDirectory: gitlab
-    documentation: docs/packages/addons/gitlab.md
 ```
 
-The package map key is the stable configuration identity. `category` is informational and may change without moving user values. `legacyPath` exists only for the 3.x-to-4.x transition and will be removed after the compatibility window. `templateDirectory` connects the public identity to the current chart implementation. `documentation` and `displayName` support generated navigation and user-facing output.
+The package map key is the stable configuration identity. `category` is informational and may change without moving user values. `legacyPath` exists only for the 3.x-to-4.x transition and will be removed after the compatibility window. `templateDirectory` connects the public identity to the current chart implementation. `displayName` supports user-facing output.
 
 The catalog deliberately does not duplicate package versions, Git sources, namespaces, enablement defaults, Flux dependencies, or child-chart values. Those remain in `values.yaml` or package templates until a separate decision establishes one authoritative source for them.
 
 The Helm compatibility helper consumes the catalog directly to identify built-in packages and their legacy paths. A generator validates uniqueness, required fields, legacy schema paths, and template directories. It then produces or keeps in sync the following derived artifacts:
 
 - built-in `packages` properties and partial schemas in `values.schema.json`;
-- the package mappings embedded in the standalone migration script;
-- package documentation navigation or indexes where practical.
+- the package mappings embedded in the standalone migration script.
 
 When `packageConfiguration.version` is absent, all entries under `packages` use the existing custom-package schema. In v1 mode, built-in schemas are deep partials of the legacy package schemas because Helm validates user values before the compatibility helper merges canonical overrides over legacy defaults. Required constraints are removed from recursively merged objects, while types, enums, patterns, known properties, and array-item requirements are retained. Child-chart overrides under `values` remain intentionally open-ended. Package-level keys present in maintained defaults but not yet described by the legacy schema remain accepted so the compatibility path does not reject supported 3.x configurations.
 
