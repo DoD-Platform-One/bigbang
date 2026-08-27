@@ -59,6 +59,17 @@ tests:
   - isKind:
       of: HelmRelease
 
+- it: should configure Mimir to accept UTF-8 metric and label names
+  set:
+    addons:
+      mimir:
+        enabled: true
+  template: mimir/values.yaml
+  asserts:
+  - matchRegex:
+      path: stringData.defaults
+      pattern: "name_validation_scheme: utf8"
+
 - it: should render kafka ingest storage structuredConfig when kafkaIngestStorage is enabled
   set:
     addons:

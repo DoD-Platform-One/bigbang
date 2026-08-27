@@ -230,9 +230,10 @@ upstream:
         name: mimir-objstore-secret
     {{- end }}
 {{- end }}
-{{- if or $minioEnabled $s3Enabled $kafkaEnabled }}
   mimir:
     structuredConfig:
+      limits:
+        name_validation_scheme: utf8
       {{- if or $minioEnabled $s3Enabled }}
       {{- if $mimirEnterpriseEnabled }}
       admin_client:
@@ -276,7 +277,6 @@ upstream:
       ingester:
         push_grpc_method_enabled: false
       {{- end }}
-{{- end }}
   {{- if and (or $minioEnabled $s3Enabled $kafkaEnabled) .Values.addons.mimir.serviceAccountAnnotations }}
   serviceAccount:
     annotations:
