@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Packages - Package - Kustomization Flux Settings
+templates:
+  - templates/package/kustomization.yaml
+tests:
+  - it: should preserve falsey package settings and inherit global defaults
+    set:
+      flux:
+        interval: 5m
+        timeout: 20m
+        force: true
+        wait: true
+        prune: true
+      packages:
+        sample:
+          enabled: true
+          kustomize: true
+          git:
+            repo: https://repo1.dso.mil/big-bang/product/packages/sample.git
+            path: ./manifests
+          flux:
+            force: false
+            wait: false
+            prune: false
+    asserts:
+      - equal:
+          path: spec.interval
+          value: 5m
+      - equal:
+          path: spec.timeout
+          value: 20m
+      - equal:
+          path: spec.force
+          value: false
+      - equal:
+          path: spec.wait
+          value: false
+      - equal:
+          path: spec.prune
+          value: false

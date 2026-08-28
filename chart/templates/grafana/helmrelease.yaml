@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettingsGrafana := merge .Values.grafana.flux .Values.flux -}}
+{{- $fluxSettingsGrafana := mergeOverwrite (deepCopy .Values.flux) .Values.grafana.flux -}}
 {{- if .Values.grafana.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2

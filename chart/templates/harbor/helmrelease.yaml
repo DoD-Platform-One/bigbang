@@ -1,6 +1,6 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "harbor" }}
-{{- $fluxSettingsHarbor := merge .Values.addons.harbor.flux .Values.flux -}}
+{{- $fluxSettingsHarbor := mergeOverwrite (deepCopy .Values.flux) .Values.addons.harbor.flux -}}
 {{- if (get .Values.addons $pkg).enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2

@@ -1,0 +1,113 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Packages - HelmRelease - Flux Settings
+templates:
+  - templates/grafana/helmrelease.yaml
+  - templates/grafana/values.yaml
+  - templates/monitoring/helmrelease.yaml
+  - templates/monitoring/values.yaml
+  - templates/cert-manager/helmrelease.yaml
+  - templates/cert-manager/values.yaml
+tests:
+  - it: should preserve falsey package overrides and inherit global defaults
+    template: grafana/helmrelease.yaml
+    set:
+      flux:
+        timeout: 10m
+        upgrade:
+          cleanupOnFail: true
+          remediation:
+            retries: 3
+            remediateLastFailure: true
+      grafana:
+        enabled: true
+        flux:
+          upgrade:
+            cleanupOnFail: false
+            remediation:
+              retries: 0
+              remediateLastFailure: false
+    documentSelector:
+      path: metadata.name
+      value: grafana
+    asserts:
+      - equal:
+          path: spec.timeout
+          value: 10m
+      - equal:
+          path: spec.upgrade.cleanupOnFail
+          value: false
+      - equal:
+          path: spec.upgrade.remediation.retries
+          value: 0
+      - equal:
+          path: spec.upgrade.remediation.remediateLastFailure
+          value: false
+
+  - it: should not leak one package override into another package
+    template: monitoring/helmrelease.yaml
+    set:
+      flux:
+        upgrade:
+          cleanupOnFail: true
+          remediation:
+            retries: 3
+            remediateLastFailure: true
+      grafana:
+        enabled: true
+        flux:
+          upgrade:
+            cleanupOnFail: false
+            remediation:
+              retries: 0
+              remediateLastFailure: false
+      monitoring:
+        enabled: true
+        flux: {}
+    documentSelector:
+      path: metadata.name
+      value: monitoring
+    asserts:
+      - equal:
+          path: spec.upgrade.cleanupOnFail
+          value: true
+      - equal:
+          path: spec.upgrade.remediation.retries
+          value: 3
+      - equal:
+          path: spec.upgrade.remediation.remediateLastFailure
+          value: true
+
+  - it: should preserve integrated cert-manager falsey package overrides
+    template: cert-manager/helmrelease.yaml
+    set:
+      flux:
+        timeout: 10m
+        upgrade:
+          cleanupOnFail: true
+          remediation:
+            retries: 3
+            remediateLastFailure: true
+      certManager:
+        enabled: true
+        flux:
+          upgrade:
+            cleanupOnFail: false
+            remediation:
+              retries: 0
+              remediateLastFailure: false
+    documentSelector:
+      path: metadata.name
+      value: cert-manager
+    asserts:
+      - equal:
+          path: spec.timeout
+          value: 10m
+      - equal:
+          path: spec.upgrade.cleanupOnFail
+          value: false
+      - equal:
+          path: spec.upgrade.remediation.retries
+          value: 0
+      - equal:
+          path: spec.upgrade.remediation.remediateLastFailure
+          value: false

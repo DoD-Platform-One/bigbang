@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettingsMinio := merge .Values.addons.minio.flux .Values.flux -}}
+{{- $fluxSettingsMinio := mergeOverwrite (deepCopy .Values.flux) .Values.addons.minio.flux -}}
 {{- if .Values.addons.minio.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

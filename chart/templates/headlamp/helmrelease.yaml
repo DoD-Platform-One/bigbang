@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettings := merge .Values.addons.headlamp.flux .Values.flux -}}
+{{- $fluxSettings := mergeOverwrite (deepCopy .Values.flux) .Values.addons.headlamp.flux -}}
 {{- if .Values.addons.headlamp.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettingsAnchore := merge .Values.addons.anchoreEnterprise.flux .Values.flux -}}
+{{- $fluxSettingsAnchore := mergeOverwrite (deepCopy .Values.flux) .Values.addons.anchoreEnterprise.flux -}}
 {{- if .Values.addons.anchoreEnterprise.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2

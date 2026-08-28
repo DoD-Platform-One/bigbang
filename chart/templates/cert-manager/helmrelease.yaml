@@ -1,6 +1,6 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
 {{- if .Values.certManager.enabled }}
-{{- $fluxSettings := merge .Values.certManager.flux .Values.flux -}}
+{{- $fluxSettings := mergeOverwrite (deepCopy .Values.flux) .Values.certManager.flux -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

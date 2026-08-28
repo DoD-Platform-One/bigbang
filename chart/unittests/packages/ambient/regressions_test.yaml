@@ -70,3 +70,35 @@ tests:
       - matchRegex:
           path: stringData.defaults
           pattern: "cni:\\n    enabled: true"
+
+  - it: should preserve ztunnel falsey Flux overrides and inherit global defaults
+    template: ztunnel/helmrelease.yaml
+    set:
+      istio.ambient.enabled: true
+      flux:
+        timeout: 10m
+        upgrade:
+          cleanupOnFail: true
+          remediation:
+            retries: 3
+            remediateLastFailure: true
+      ztunnel:
+        flux:
+          upgrade:
+            cleanupOnFail: false
+            remediation:
+              retries: 0
+              remediateLastFailure: false
+    asserts:
+      - equal:
+          path: spec.timeout
+          value: 10m
+      - equal:
+          path: spec.upgrade.cleanupOnFail
+          value: false
+      - equal:
+          path: spec.upgrade.remediation.retries
+          value: 0
+      - equal:
+          path: spec.upgrade.remediation.remediateLastFailure
+          value: false

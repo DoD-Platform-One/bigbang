@@ -1,6 +1,6 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "kyvernoReporter" }}
-{{- $fluxSettings := merge .Values.kyvernoReporter.flux .Values.flux -}}
+{{- $fluxSettings := mergeOverwrite (deepCopy .Values.flux) .Values.kyvernoReporter.flux -}}
 {{- if (get .Values $pkg).enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 apiVersion: helm.toolkit.fluxcd.io/v2
