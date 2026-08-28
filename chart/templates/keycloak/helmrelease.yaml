@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettingsKeycloak := merge .Values.addons.keycloak.flux .Values.flux -}}
+{{- $fluxSettingsKeycloak := mergeOverwrite (deepCopy .Values.flux) .Values.addons.keycloak.flux -}}
 {{- if .Values.addons.keycloak.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $tlsEnabled := and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key -}}

@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettings := merge .Values.addons.externalSecrets.flux .Values.flux -}}
+{{- $fluxSettings := mergeOverwrite (deepCopy .Values.flux) .Values.addons.externalSecrets.flux -}}
 {{- if .Values.addons.externalSecrets.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $externalSecretsValues := .Values.addons.externalSecrets.values | default dict }}

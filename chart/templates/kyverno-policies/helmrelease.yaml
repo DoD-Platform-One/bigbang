@@ -1,6 +1,6 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "kyvernoPolicies" }}
-{{- $fluxSettings := merge .Values.kyvernoPolicies.flux .Values.flux -}}
+{{- $fluxSettings := mergeOverwrite (deepCopy .Values.flux) .Values.kyvernoPolicies.flux -}}
 {{- if (get .Values $pkg).enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

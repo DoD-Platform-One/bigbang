@@ -3,7 +3,7 @@
 {{- range $pkg, $vals := (.Values._customPackages | default dict) -}}
 {{- if and (dig "enabled" true $vals) $vals.kustomize (eq (dig "sourceType" "git" $vals) "git") ($vals.git) -}}
 {{- $pkg := include "resourceName" $pkg -}}
-{{- $fluxSettings := merge (default $vals.flux (dict)) $.Values.flux -}}
+{{- $fluxSettings := mergeOverwrite (deepCopy $.Values.flux) (default (dict) $vals.flux) -}}
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:

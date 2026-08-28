@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettingsIstioCNI := merge .Values.istioCNI.flux .Values.flux -}}
+{{- $fluxSettingsIstioCNI := mergeOverwrite (deepCopy .Values.flux) .Values.istioCNI.flux -}}
 {{- if or .Values.istioCNI.enabled (eq (include "ambientEnabled" .) "true") }}
 {{- if not .Values.istiod.enabled }}
 {{- fail "istioCNI requires istiod to be enabled" }}

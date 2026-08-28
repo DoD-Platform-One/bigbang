@@ -1,6 +1,6 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
 {{- $pkg := "thanos" }}
-{{- $fluxSettingsThanos := merge .Values.addons.thanos.flux .Values.flux -}}
+{{- $fluxSettingsThanos := mergeOverwrite (deepCopy .Values.flux) .Values.addons.thanos.flux -}}
 {{- if (get .Values.addons $pkg).enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $havePostRenderers := (get .Values.addons $pkg).postRenderers }}

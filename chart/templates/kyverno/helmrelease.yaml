@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettingskyverno := merge .Values.kyverno.flux .Values.flux -}}
+{{- $fluxSettingskyverno := mergeOverwrite (deepCopy .Values.flux) .Values.kyverno.flux -}}
 {{- if or .Values.kyverno.enabled .Values.kyvernoPolicies.enabled .Values.kyvernoReporter.enabled }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease

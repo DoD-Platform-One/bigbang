@@ -101,13 +101,15 @@ tests:
     asserts:
       - notFailedTemplate: {}
 
-  - it: should fail validation when a Git source is incomplete
+  - it: should fail validation when a Git source omits its repo
     set:
       packages:
         sample:
           enabled: true
           sourceType: git
           git:
+            repo: null
+            path: charts/podinfo
             tag: "6.3.4"
     asserts:
       - failedTemplate:

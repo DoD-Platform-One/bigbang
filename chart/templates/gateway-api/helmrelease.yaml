@@ -1,5 +1,5 @@
 {{- include "bigbang.normalizePackageAliases" . -}}
-{{- $fluxSettingsGatewayAPI := merge .Values.gatewayAPI.flux .Values.flux -}}
+{{- $fluxSettingsGatewayAPI := mergeOverwrite (deepCopy .Values.flux) .Values.gatewayAPI.flux -}}
 {{- if or .Values.gatewayAPI.enabled (eq (include "ambientEnabled" .) "true") }}
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
