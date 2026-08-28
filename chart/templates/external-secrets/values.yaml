@@ -9,7 +9,6 @@
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false $externalSecretsValues) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $webhookEnabled := dig "upstream" "webhook" "create" false $externalSecretsValues }}
 {{- $certControllerEnabled := dig "upstream" "certController" "create" false $externalSecretsValues }}
-{{- $authorizationPoliciesEnabled := include "authorizationPoliciesEnabled" (list $externalSecretsValues .) }}
 
 upstream:
   image:
@@ -31,33 +30,21 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 istio:
-  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ $istioHardenedEnabled }}
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
   authorizationPolicies:
-    enabled: {{ $authorizationPoliciesEnabled }}
-    generateFromNetpol: {{ $authorizationPoliciesEnabled }}
     additionalPolicies:
       allow-ingress-to-external-secrets-webhook-tcp-port-10250-from-kube-api:
         enabled: {{ $webhookEnabled }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6}}
     to:
       external-secrets-webhook:10250:
         from:
           definition:
             kubeAPI: {{ $webhookEnabled }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6}}
     from:
       external-secrets:
         to:

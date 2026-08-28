@@ -78,7 +78,6 @@ flux:
 
 {{/* bb-common Istio defaults for monitoring follow hardened posture. */}}
 istio:
-  enabled: {{ $istioEnabled }}
   {{- if $monitoringAuthserviceWaypoint }}
   # Prefix bb-common Istio resources with the release name so the auto-created
   # waypoint Gateway is named monitoring-monitoring-waypoint (referenced by the
@@ -88,8 +87,6 @@ istio:
   sidecar:
     enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
     outboundTrafficPolicyMode: REGISTRY_ONLY
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
   {{- if and $istioHardenedEnabled (contains "s3" .Values.addons.thanos.objectStorage.endpoint) }}
   serviceEntries:
     custom:
@@ -108,9 +105,6 @@ istio:
   serviceEntries:
     custom: []
   {{- end }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.monitoring.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.monitoring.values .) }}
 routes:
   inbound:
     monitoring-prometheus:
@@ -145,13 +139,9 @@ routes:
       - alertmanager.{{ $domainName }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   defaultsAsHooks:
     enabled: true
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       {{ if not $isDefaultKpsName }}
       # Need to make a couple changes to the default package netpols when the name is overridden
@@ -192,7 +182,6 @@ networkPolicies:
           k8s:
             authservice/authservice:10003: {{ $authserviceEnabled }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       {{ $kpsName }}:10250:
         from:

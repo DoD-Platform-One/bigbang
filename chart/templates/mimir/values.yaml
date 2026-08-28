@@ -22,7 +22,6 @@
 {{- $minioEnabled := (.Values.addons.mimir.minioObjectStorage.enabled) }}
 {{- $s3Enabled := (.Values.addons.mimir.s3ObjectStorage.enabled) }}
 {{- $mimirEnterpriseEnabled := (.Values.addons.mimir.enterprise.enabled) }}
-{{- $istioInjection := (and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.mimir) "enabled"))  }}
 {{- $kafkaEnabled := (.Values.addons.mimir.kafkaIngestStorage.enabled) }}
 {{- $kafkaBrokerHost := (.Values.addons.mimir.kafkaIngestStorage.brokerHost) }}
 {{- $kafkaBrokerPort := (.Values.addons.mimir.kafkaIngestStorage.brokerPort) }}
@@ -39,19 +38,8 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 istio:
-  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ $istioHardenedEnabled }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mimir.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mimir.values .) }}
 
 routes:
   inbound:
@@ -96,19 +84,19 @@ routes:
           protocol: TCP
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   egress:
+    {{- if and $kafkaEnabled $kafkaBrokerNetworkCIDR }}
     definitions:
-      {{- $egressDefs := .Values.networkPolicies.egress.definitions | deepCopy }}
-      {{- if and $kafkaEnabled $kafkaBrokerNetworkCIDR }}
       {{- /* Override kafka-subnets with the specific broker CIDR and only the configured port */}}
-      {{- $kafkaDef := dict "to" (list (dict "ipBlock" (dict "cidr" $kafkaBrokerNetworkCIDR))) "ports" (list (dict "port" $kafkaBrokerPort "protocol" "TCP")) }}
-      {{- $_ := set $egressDefs "kafka-subnets" $kafkaDef }}
-      {{- end }}
-      {{ $egressDefs | toYaml | nindent 6 }}
+      kafka-subnets:
+        to:
+          - ipBlock:
+              cidr: {{ $kafkaBrokerNetworkCIDR }}
+        ports:
+          - port: {{ $kafkaBrokerPort }}
+            protocol: TCP
+    {{- end }}
     from:
       mimir:
         to:
@@ -148,7 +136,6 @@ networkPolicies:
             kubeAPI: {{ $minioEnabled }}
 
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       mimir:[15020]:
         from:

@@ -28,7 +28,6 @@ domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.gitlab) "enabled") }}
 {{- $extObjStorageIsConfigured := (or .Values.addons.gitlab.objectStorage.region .Values.addons.gitlab.objectStorage.endpoint) }}
 {{- $consolidatedObjStoreEnabled := dig "global" "appConfig" "object_store" "enabled" false .Values.addons.gitlab.values }}
 {{- $iamProfile := (and (ne .Values.addons.gitlab.objectStorage.iamProfile "") $extObjStorageIsConfigured) }}
@@ -47,93 +46,6 @@ domain: {{ $domainName }}
   {{- if kindIs "map" $configuredPsqlValues }}
     {{- $gitlabPsqlValues = $configuredPsqlValues }}
   {{- end }}
-{{- end }}
-{{- $gitlabEgressDefinitions := deepCopy .Values.networkPolicies.egress.definitions }}
-{{- if $externalPostgresConfigured }}
-  {{- $databaseDefinition := (get $gitlabEgressDefinitions "database-subnets") | default dict }}
-  {{- if or (not (kindIs "map" $databaseDefinition)) (empty $databaseDefinition) }}
-    {{- $databaseDefinition = dict
-      "to" (list
-        (dict "ipBlock" (dict "cidr" "192.168.0.0/16"))
-        (dict "ipBlock" (dict "cidr" "172.16.0.0/12"))
-        (dict "ipBlock" (dict "cidr" "10.0.0.0/8")))
-      "ports" (list (dict "port" 5432 "protocol" "TCP")) }}
-  {{- end }}
-  {{- $databasePorts := (get $databaseDefinition "ports") | default list }}
-  {{- if not (kindIs "slice" $databasePorts) }}
-    {{- $databasePorts = list }}
-  {{- end }}
-  {{- $databasePortNumbers := list }}
-  {{- range $entry := $databasePorts }}
-    {{- if kindIs "map" $entry }}
-      {{- if hasKey $entry "port" }}
-        {{- $databasePortNumbers = append $databasePortNumbers ((get $entry "port") | int) }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-  {{- $configuredDatabasePorts := list }}
-  {{- if not (empty .Values.addons.gitlab.database.host) }}
-    {{- $configuredDatabasePorts = append $configuredDatabasePorts (.Values.addons.gitlab.database.port | default 5432 | int) }}
-  {{- end }}
-  {{- if or (not (empty (get $gitlabPsqlValues "host"))) (not (empty (get $gitlabPsqlValues "port"))) }}
-    {{- $configuredDatabasePorts = append $configuredDatabasePorts ((get $gitlabPsqlValues "port") | default 5432 | int) }}
-  {{- end }}
-  {{- range $databaseName := list "main" "ci" "embedding" "sec" }}
-    {{- $databaseValues := (get $gitlabPsqlValues $databaseName) | default dict }}
-    {{- if kindIs "map" $databaseValues }}
-      {{- $databasePort := get $databaseValues "port" }}
-      {{- if or (not (empty $databasePort)) (and (eq $databaseName "main") (not (empty (get $databaseValues "host")))) }}
-        {{- $configuredDatabasePorts = append $configuredDatabasePorts ($databasePort | default 5432 | int) }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-  {{- range $configuredDatabasePort := $configuredDatabasePorts }}
-    {{- if not (has $configuredDatabasePort $databasePortNumbers) }}
-      {{- $databasePorts = append $databasePorts (dict "port" $configuredDatabasePort "protocol" "TCP") }}
-      {{- $databasePortNumbers = append $databasePortNumbers $configuredDatabasePort }}
-    {{- end }}
-  {{- end }}
-  {{- $_ := set $databaseDefinition "ports" $databasePorts }}
-  {{- $_ := set $gitlabEgressDefinitions "database-subnets" $databaseDefinition }}
-{{- end }}
-{{- if $externalRedisConfigured }}
-  {{- $redisDefinition := (get $gitlabEgressDefinitions "redis-subnets") | default dict }}
-  {{- if or (not (kindIs "map" $redisDefinition)) (empty $redisDefinition) }}
-    {{- $redisDefinition = dict
-      "to" (list
-        (dict "ipBlock" (dict "cidr" "192.168.0.0/16"))
-        (dict "ipBlock" (dict "cidr" "172.16.0.0/12"))
-        (dict "ipBlock" (dict "cidr" "10.0.0.0/8")))
-      "ports" (list (dict "port" 6379 "protocol" "TCP")) }}
-  {{- end }}
-  {{- $redisPorts := (get $redisDefinition "ports") | default list }}
-  {{- $redisPortNumbers := list }}
-  {{- range $entry := $redisPorts }}
-    {{- if kindIs "map" $entry }}
-      {{- $redisPortNumbers = append $redisPortNumbers ((get $entry "port") | int) }}
-    {{- end }}
-  {{- end }}
-  {{- $configuredRedisPort := get $gitlabRedisValues "port" }}
-  {{- if not (empty $configuredRedisPort) }}
-    {{- $configuredRedisPort = int $configuredRedisPort }}
-    {{- if not (has $configuredRedisPort $redisPortNumbers) }}
-      {{- $redisPorts = append $redisPorts (dict "port" $configuredRedisPort "protocol" "TCP") }}
-      {{- $redisPortNumbers = append $redisPortNumbers $configuredRedisPort }}
-    {{- end }}
-  {{- end }}
-  {{- range $sentinel := (get $gitlabRedisValues "sentinels") | default list }}
-    {{- if kindIs "map" $sentinel }}
-      {{- $sentinelPort := (get $sentinel "port") | default 26379 | int }}
-      {{- if not (has $sentinelPort $redisPortNumbers) }}
-        {{- $redisPorts = append $redisPorts (dict "port" $sentinelPort "protocol" "TCP") }}
-        {{- $redisPortNumbers = append $redisPortNumbers $sentinelPort }}
-      {{- end }}
-    {{- end }}
-  {{- end }}
-  {{- $_ := set $redisDefinition "ports" $redisPorts }}
-  {{- $_ := set $gitlabEgressDefinitions "redis-subnets" $redisDefinition }}
-{{- else }}
-  {{- $_ := unset $gitlabEgressDefinitions "redis-subnets" }}
 {{- end }}
 
 openshift: {{ .Values.openshift }}
@@ -228,21 +140,11 @@ routes:
 
 {{- $istioHardened := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
-  enabled: {{ $istioEnabled }}
   sidecar:
     enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.gitlab.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.gitlab.values .) }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
     to:
       redis:9121: 
         from:
@@ -315,7 +217,6 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled }}
   egress:
-    definitions: {{ toYaml $gitlabEgressDefinitions | nindent 6 }}
     from:
       "*":
         to:

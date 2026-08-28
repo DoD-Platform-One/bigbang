@@ -28,18 +28,8 @@ clusterName: ""
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.loki.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.loki.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.loki.values .) }}
+    enabled: {{ $istioHardenedEnabled }}
 
 routes:
   inbound:
@@ -76,11 +66,7 @@ image:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       logging-loki:3100:
         from:
@@ -105,7 +91,6 @@ networkPolicies:
           k8s:
             minio-operator@minio-operator/minio-operator: {{ $minioEnabled }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       logging-loki:
         to:

@@ -18,7 +18,6 @@
 {{- end }}
 
 {{- define "bigbang.defaults.authservice" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $ambientEnabled := eq (include "ambientEnabled" .) "true" }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -33,20 +32,8 @@
 }}
 
 istio:
-  enabled: {{ $istioEnabled }}
-
   hardened:
     enabled: {{ $istioHardenedEnabled }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.authservice.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.authservice.values .) }}
 
   clusterWideHardenedEnabled: {{ dig "hardened" "enabled" false .Values.istiod.values }}
 
@@ -76,11 +63,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled | default false }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
-  ingress: 
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
+  ingress:
     to:
       # gRPC connections for pods with protect=keycloak label
       authservice:10003:
@@ -130,7 +113,6 @@ networkPolicies:
             "istio-gateway/*": {{ and $ambientEnabled .Values.istioGateway.enabled }}
             kiali-service-account@kiali/kiali: {{ and $ambientEnabled .Values.kiali.enabled }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       authservice:
         to:

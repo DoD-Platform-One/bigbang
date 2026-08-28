@@ -2,7 +2,7 @@
 {{- $pkg := "kyvernoPolicies" }}
 
 {{- if (get .Values $pkg).enabled }}
-{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.kyverno-policies" .))) "name" "kyverno-policies" "defaults" (include "bigbang.defaults.kyverno-policies" .)) }}
+{{- include "values-secret" (dict "root" $ "package" (dict "values" (fromYaml (include "bigbang.overlays.kyverno-policies" .))) "name" "kyverno-policies" "defaults" (include "bigbang.defaults.kyverno-policies" .) "injectCommonDefaults" false) }}
 {{- end }}
 
 {{- define "bigbang.defaults.kyverno-policies" -}}

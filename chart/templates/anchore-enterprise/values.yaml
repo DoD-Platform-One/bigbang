@@ -93,27 +93,11 @@ routes:
       - 'docker-images-prod.6aa30f8b08e16409b46e0173d6de2f56.r2.cloudflarestorage.com' # https://docs.docker.com/desktop/setup/allow-list/
 
 istio:
-  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ $istioHardenedEnabled }}
 
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.anchoreEnterprise.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.anchoreEnterprise.values .) }}
-
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: 
-      {{ toYaml .Values.networkPolicies.ingress.definitions | nindent 6 }}
     to:
       catalog:8082:
         podSelector:
@@ -177,8 +161,6 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ and (dig "alloyMetrics" "enabled" false .Values.alloy) (not $externalRedisEnabled) }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled (not $externalRedisEnabled) }}
   egress:
-    definitions:
-      {{ toYaml .Values.networkPolicies.egress.definitions | nindent 6 }}
     from:
       "*":
         to:

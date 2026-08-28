@@ -27,7 +27,6 @@
 {{- $mimirEnabled := .Values.addons.mimir.enabled }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $ambientEnabled := eq (include "ambientEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.alloy.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{/* When ambient mode is enabled, sidecar injection is disabled since sidecars are not used */}}
 {{- $sidecarInjectionEnabled := and $istioEnabled (not $ambientEnabled) }}
 
@@ -49,11 +48,7 @@ monitoring:
   enabled: {{ .Values.monitoring.enabled }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       # Allow alloy-metrics and Prometheus to scrape alloy-receiver
       alloy-receiver:12345:
@@ -97,7 +92,6 @@ networkPolicies:
             "*/*": true
       {{- end }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       alloy-logs:
         to:
@@ -139,19 +133,6 @@ networkPolicies:
             {{- end }}
             mimir/mimir-mimir-gateway:8080: {{ $mimirEnabled }}
       {{- end }}
-istio:
-  enabled: {{ $istioEnabled }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.alloy.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.alloy.values .) }}
-
 routes:
   outbound:
     bb-tests:

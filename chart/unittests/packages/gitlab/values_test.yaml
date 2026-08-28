@@ -141,43 +141,6 @@ tests:
       - notExists:
           path: global.appConfig.dependencyProxy.connection
 
-  - it: preserves GitLab 18 network policy defaults when removed service blocks are absent
-    postRenderer:
-      cmd: "sh"
-      args:
-        - "-c"
-        - "yq eval '.stringData.defaults' - | yq eval '.'"
-    set:
-      addons.gitlab.enabled: true
-    asserts:
-      - equal:
-          path: networkPolicies.egress.from.migrations.to.definition.storage-subnets
-          value: false
-      - equal:
-          path: networkPolicies.egress.from.migrations.to.definition.database-subnets
-          value: false
-      - notExists:
-          path: networkPolicies.egress.definitions.redis-subnets
-      - notExists:
-          path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
-      - notExists:
-          path: networkPolicies.egress.from.sidekiq.to.definition.redis-subnets
-      - notExists:
-          path: networkPolicies.egress.from.migrations.to.definition.redis-subnets
-      - notExists:
-          path: networkPolicies.egress.from.toolbox.to.definition.redis-subnets
-      - notExists:
-          path: networkPolicies.egress.from.gitlab-exporter.to.definition.redis-subnets
-      - equal:
-          path: networkPolicies.egress.from.gitlab-exporter.to.definition.database-subnets
-          value: false
-      - notExists:
-          path: redis-bb
-      - notExists:
-          path: garage
-      - notExists:
-          path: postgresql.enabled
-
   - it: enables external subnet egress for Big Bang GitLab 19 connection values
     postRenderer:
       cmd: "sh"
@@ -187,7 +150,6 @@ tests:
     set:
       addons.gitlab.enabled: true
       addons.gitlab.database.host: postgresql-rw.postgresql.svc.cluster.local
-      addons.gitlab.database.port: 6432
       addons.gitlab.objectStorage.type: minio
       addons.gitlab.objectStorage.endpoint: http://garage.garage.svc.cluster.local:3900
       addons.gitlab.objectStorage.region: garage
@@ -201,11 +163,6 @@ tests:
       - equal:
           path: networkPolicies.egress.from.gitlab-exporter.to.definition.database-subnets
           value: true
-      - contains:
-          path: networkPolicies.egress.definitions.database-subnets.ports
-          content:
-            port: 6432
-            protocol: TCP
 
   - it: enables external subnet egress for direct upstream GitLab 19 values
     postRenderer:
@@ -216,9 +173,7 @@ tests:
     set:
       addons.gitlab.enabled: true
       addons.gitlab.values.global.psql.host: postgres.example.internal
-      addons.gitlab.values.global.psql.port: 7432
       addons.gitlab.values.global.redis.host: redis.example.internal
-      addons.gitlab.values.global.redis.port: 6380
       addons.gitlab.values.global.appConfig.object_store.enabled: true
     asserts:
       - equal:
@@ -227,11 +182,6 @@ tests:
       - equal:
           path: networkPolicies.egress.from.migrations.to.definition.database-subnets
           value: true
-      - contains:
-          path: networkPolicies.egress.definitions.database-subnets.ports
-          content:
-            port: 7432
-            protocol: TCP
       - equal:
           path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
           value: true
@@ -247,37 +197,6 @@ tests:
       - equal:
           path: networkPolicies.egress.from.gitlab-exporter.to.definition.redis-subnets
           value: true
-      - contains:
-          path: networkPolicies.egress.definitions.redis-subnets.ports
-          content:
-            port: 6380
-            protocol: TCP
-
-  - it: enables database subnet egress for decomposed upstream PostgreSQL values
-    postRenderer:
-      cmd: "sh"
-      args:
-        - "-c"
-        - "yq eval '.stringData.defaults' - | yq eval '.'"
-    set:
-      addons.gitlab.enabled: true
-      addons.gitlab.values.global.psql.main.host: postgres.example.internal
-      addons.gitlab.values.global.psql.main.port: 8432
-      addons.gitlab.values.global.psql.ci.port: 9432
-    asserts:
-      - equal:
-          path: networkPolicies.egress.from.migrations.to.definition.database-subnets
-          value: true
-      - contains:
-          path: networkPolicies.egress.definitions.database-subnets.ports
-          content:
-            port: 8432
-            protocol: TCP
-      - contains:
-          path: networkPolicies.egress.definitions.database-subnets.ports
-          content:
-            port: 9432
-            protocol: TCP
 
   - it: enables external storage subnet egress for direct per-feature object storage values
     postRenderer:
@@ -313,11 +232,6 @@ tests:
           value: true
       - exists:
           path: networkPolicies.egress.definitions.redis-subnets
-      - contains:
-          path: networkPolicies.egress.definitions.redis-subnets.ports
-          content:
-            port: 26379
-            protocol: TCP
 
   - it: enables external Redis subnet egress for an upstream redis.yml override
     postRenderer:
@@ -335,11 +249,6 @@ tests:
       - equal:
           path: networkPolicies.egress.from.webservice.to.definition.redis-subnets
           value: true
-      - contains:
-          path: networkPolicies.egress.definitions.redis-subnets.ports
-          content:
-            port: 6379
-            protocol: TCP
 
   - it: enables external Redis subnet egress when password authentication is disabled
     postRenderer:
@@ -357,31 +266,6 @@ tests:
           value: true
       - exists:
           path: networkPolicies.egress.definitions.redis-subnets
-
-  - it: restores the Redis definition when upgrading with reused pre-existing values
-    postRenderer:
-      cmd: "sh"
-      args:
-        - "-c"
-        - "yq eval '.stringData.defaults' - | yq eval '.'"
-    set:
-      addons.gitlab.enabled: true
-      addons.gitlab.values.global.redis.host: redis.example.internal
-      networkPolicies.egress.definitions.redis-subnets: null
-    asserts:
-      - equal:
-          path: networkPolicies.egress.definitions.redis-subnets
-          value:
-            to:
-              - ipBlock:
-                  cidr: 192.168.0.0/16
-              - ipBlock:
-                  cidr: 172.16.0.0/12
-              - ipBlock:
-                  cidr: 10.0.0.0/8
-            ports:
-              - port: 6379
-                protocol: TCP
 
   - it: tolerates null GitLab 19 removed service blocks without enabling replacements
     postRenderer:

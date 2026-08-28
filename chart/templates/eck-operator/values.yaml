@@ -13,7 +13,6 @@
 
 {{- define "bigbang.defaults.eck-operator" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.eckOperator.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 license:
   trial: {{ .Values.elasticsearchKibana.license.trial }}
   keyJSON: |
@@ -23,19 +22,6 @@ image:
   pullPolicy: {{ .Values.imagePullPolicy }}
 
 openshift: {{ .Values.openshift }}
-
-istio:
-  enabled: {{ $istioEnabled }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.eckOperator.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.eckOperator.values .) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
@@ -51,18 +37,14 @@ serviceMonitor:
   {{- end }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       elastic-operator:8080:
         from:
           k8s:
             monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+    definitions:
       kubeAPI:
         to:
           - ipBlock:

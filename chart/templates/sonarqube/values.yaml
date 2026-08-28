@@ -24,26 +24,14 @@
 domain: {{ $domainName }}
 
 # Define variables to help with conditionals later
-{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.sonarqube) "enabled") }}
 {{- $localSSOEnabled := and .Values.addons.keycloak.enabled .Values.addons.sonarqube.sso.enabled }}
 
 OpenShift:
   enabled: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ $istioEnabled }}
   hardened:
-    enabled: {{ or (dig "istio" "hardened" "enabled" false .Values.addons.sonarqube.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.sonarqube.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.sonarqube.values .) }}
+    enabled: {{ $istioHardenedEnabled }}
 
 routes:
   inbound:
@@ -74,11 +62,7 @@ routes:
       - {{ include "sso.host" . }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       sonarqube:[8000,8001,9000]:
         podSelector:
@@ -89,7 +73,6 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       sonarqube:
         podSelector:

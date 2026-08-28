@@ -13,7 +13,6 @@
 {{- $disableDefault := dig "additionalOutputs" "disableDefault" false .Values.fluentbit.values }}
 {{- $clusterName := ( default "logging-loki" .Values.loki.clusterName ) }}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.fluentbit) "enabled") }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.fluentbit.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $additionalS3 := (and
   (dig "additionalOutputs" "s3" "bucket" false .Values.fluentbit.values)
@@ -35,15 +34,11 @@
 {{- $lokiWriteDestUrl := printf "%s.logging" $lokiServiceName }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
   controlPlaneCidr: {{ .Values.networkPolicies.controlPlaneCidr }}
   vpcCidr: {{ .Values.networkPolicies.vpcCidr }}
   istioNamespaceSelector:
   {{ include "istioNamespaceSelector" . | nindent 4 }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       fluent-bit:
         to:
@@ -69,7 +64,6 @@ networkPolicies:
             tempo/tempo:9411:
               enabled: {{ .Values.tempo.enabled }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       "fluent-bit:2020":
         from:
@@ -77,16 +71,8 @@ networkPolicies:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 istio:
-  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ $istioHardenedEnabled }}
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.fluentbit.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.fluentbit.values .) }}
 
 routes:
   outbound:

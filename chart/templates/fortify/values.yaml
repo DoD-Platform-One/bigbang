@@ -35,15 +35,8 @@ domain: {{ $domainName }}
 openshift: {{ .Values.openshift }}
 
 istio:
-  enabled: {{ $istioEnabled }}
   hardened:
     enabled: {{ $istioHardened }}
-  sidecar:
-    enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.fortify.values .) }}
 
 routes:
   inbound:
@@ -75,7 +68,6 @@ routes:
           protocol: TCP
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
   egress:
     from:
       fortify-webapp:

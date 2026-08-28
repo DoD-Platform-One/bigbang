@@ -77,18 +77,10 @@ routes:
       hosts:
       - thanos-minio.{{ .Values.domain }}
 
+{{- if $thanosAuthserviceWaypoint }}
 istio:
-  enabled: {{ $istioEnabled }}
-  {{- if $thanosAuthserviceWaypoint }}
   prependReleaseName: true
-  {{- end }}
-  sidecar:
-    enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.thanos.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.thanos.values .) }}
+{{- end }}
 
 minio:
   enabled: {{ $shouldEnableMinio }}
@@ -101,11 +93,7 @@ minio:
   {{- end }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       '*':
         to:
@@ -136,7 +124,6 @@ networkPolicies:
           definition:
             storage-subnets: {{ $storeGatewayEnabled }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       minio:9000:
         from:

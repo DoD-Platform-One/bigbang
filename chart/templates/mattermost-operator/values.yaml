@@ -13,7 +13,6 @@
 
 {{- define "bigbang.defaults.mattermostOperator" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.mattermostOperator.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- include "secretsImagePullSecretsWithName" . }}
 
 image:
@@ -23,25 +22,6 @@ image:
 podAnnotations:
   {{ include "istioAnnotation" . }}
 {{- end }}
-
-networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
-  egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
-  ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
-
-istio:
-  enabled: {{ $istioEnabled }}
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermostOperator.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermostOperator.values .) }}
 
 monitoring:
   enabled: {{ .Values.monitoring.enabled }}
