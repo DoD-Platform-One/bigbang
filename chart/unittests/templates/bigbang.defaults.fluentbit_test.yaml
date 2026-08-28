@@ -4,18 +4,8 @@ templates:
 - templates/_self-test/render.yaml
 - templates/fluentbit/values.yaml
 tests:
-- it: must source storage-subnets from global definitions and enable when S3 output is configured
+- it: must enable storage-subnets egress when S3 output is configured
   set:
-    networkPolicies:
-      egress:
-        definitions:
-          storage-subnets:
-            to:
-              - ipBlock:
-                  cidr: 10.99.0.0/16
-            ports:
-              - port: 443
-                protocol: TCP
     fluentbit:
       values:
         additionalOutputs:
@@ -31,7 +21,32 @@ tests:
   template: templates/_self-test/render.yaml
   asserts:
   - equal:
-      path: result.networkPolicies.egress.definitions["storage-subnets"]
+      path: result.networkPolicies.egress.from["fluent-bit"].to.definition["storage-subnets"].enabled
+      value: true
+
+- it: must source storage-subnets from global definitions in the rendered secret
+  set:
+    networkPolicies:
+      egress:
+        definitions:
+          storage-subnets:
+            to:
+              - ipBlock:
+                  cidr: 10.99.0.0/16
+            ports:
+              - port: 443
+                protocol: TCP
+    fluentbit:
+      enabled: true
+  template: templates/fluentbit/values.yaml
+  postRenderer:
+    cmd: "sh"
+    args:
+      - "-c"
+      - "yq eval '.stringData.common' - | yq eval '.'"
+  asserts:
+  - equal:
+      path: networkPolicies.egress.definitions["storage-subnets"]
       value:
         to:
           - ipBlock:
@@ -39,6 +54,3 @@ tests:
         ports:
           - port: 443
             protocol: TCP
-  - equal:
-      path: result.networkPolicies.egress.from["fluent-bit"].to.definition["storage-subnets"].enabled
-      value: true

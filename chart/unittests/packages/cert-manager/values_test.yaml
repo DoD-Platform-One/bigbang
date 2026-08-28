@@ -19,13 +19,26 @@ tests:
           path: upstream.prometheus.servicemonitor.enabled
           value: false
       - equal:
-          path: bb-common.istio.sidecar.enabled
-          value: false
-      - equal:
           path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
           value: http
       - notExists:
           path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig
+
+  - it: nests sidecar-disabled istio settings under bb-common in common for the integrated namespace
+    set:
+      certManager.enabled: true
+      monitoring.enabled: false
+      istiod.enabled: true
+      istio.ambient.enabled: false
+    postRenderer:
+      cmd: sh
+      args:
+        - -c
+        - "yq eval '.stringData.common' - | yq eval '.'"
+    asserts:
+      - equal:
+          path: bb-common.istio.sidecar.enabled
+          value: false
 
   - it: keeps metrics TLS disabled for the integrated ambient path
     set:
@@ -43,16 +56,29 @@ tests:
           path: upstream.prometheus.servicemonitor.enabled
           value: true
       - equal:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
+          value: http
+      - notExists:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig
+
+  - it: nests ambient-enabled istio settings under bb-common in common for the integrated ambient path
+    set:
+      certManager.enabled: true
+      monitoring.enabled: true
+      istiod.enabled: true
+      istio.ambient.enabled: true
+    postRenderer:
+      cmd: sh
+      args:
+        - -c
+        - "yq eval '.stringData.common' - | yq eval '.'"
+    asserts:
+      - equal:
           path: bb-common.istio.ambient.enabled
           value: true
       - equal:
           path: bb-common.istio.sidecar.enabled
           value: false
-      - equal:
-          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
-          value: http
-      - notExists:
-          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig
 
   - it: keeps metrics TLS disabled when Istio is disabled
     set:
@@ -66,13 +92,25 @@ tests:
         - "yq eval '.stringData.defaults' - | yq eval '.'"
     asserts:
       - equal:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
+          value: http
+      - notExists:
+          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig
+
+  - it: nests disabled istio settings under bb-common in common when Istio is disabled
+    set:
+      certManager.enabled: true
+      istiod.enabled: false
+      istio.ambient.enabled: false
+    postRenderer:
+      cmd: sh
+      args:
+        - -c
+        - "yq eval '.stringData.common' - | yq eval '.'"
+    asserts:
+      - equal:
           path: bb-common.istio.enabled
           value: false
       - equal:
           path: bb-common.istio.sidecar.enabled
           value: false
-      - equal:
-          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.scheme
-          value: http
-      - notExists:
-          path: upstream.prometheus.servicemonitor.endpointAdditionalProperties.tlsConfig

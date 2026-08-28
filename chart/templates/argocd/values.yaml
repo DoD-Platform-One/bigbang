@@ -15,11 +15,6 @@
 
 {{- define "bigbang.defaults.argocd" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardened := or
-  (dig "istio" "hardened" "enabled" false .Values.addons.argocd.values)
-  (dig "hardened" "enabled" false .Values.istiod.values)
-}}
-{{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.argocd) "enabled") }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -96,17 +91,6 @@ global:
     service.istio.io/canonical-name: argocd-argocd
 {{- end }}
 
-istio:
-  enabled: {{ $istioEnabled }}
-  sidecar:
-    enabled: {{ and $istioHardened (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-  injection: {{ ternary "disabled" (dig "istio" "injection" "enabled" .Values.addons.argocd) (eq (include "ambientEnabled" .) "true") }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.argocd.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.argocd.values .) }}
-
 monitoring:
   enabled: {{ eq (include "metricScrapingEnabled" .) "true" }}
 
@@ -130,10 +114,6 @@ routes:
       - 'repo1.dso.mil'
 
 networkPolicies:
-  # -- Toggle BigBang networkPolicies integration
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
     to:
       # -- Ingress to argocd-server for metrics from prometheus

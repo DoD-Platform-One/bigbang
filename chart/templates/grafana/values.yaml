@@ -16,7 +16,6 @@
 
 {{- define "bigbang.defaults.grafana" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.grafana.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -45,34 +44,15 @@ enterprise:
   license: {{ .Values.grafana.enterprise.license | quote }}
 {{- end }}
 
-istio:
-  enabled: {{ $istioEnabled }}
-  injection: {{ ternary "disabled" (dig "istio" "injection" "enabled" .Values.grafana) (eq (include "ambientEnabled" .) "true") }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.grafana.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.grafana.values .) }}
-
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
   prependReleaseName: true
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       grafana:3000:
         from:
           k8s:
             kiali/kiali: {{ .Values.kiali.enabled }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       "*":
         to:

@@ -17,21 +17,11 @@
 {{- $domainName := default .Values.domain .Values.hostname }}
 {{- $istioHardenedEnabled := dig "hardened" "enabled" false .Values.istiod.values }}
 istio:
-  enabled: {{ .Values.istiod.enabled }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.headlamp.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.headlamp.values .) }}
   sidecar:
     enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       headlamp:
         to:
@@ -41,7 +31,6 @@ networkPolicies:
             kubeAPI: true
             sso: {{ .Values.addons.headlamp.sso.enabled }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       headlamp:4466:
         from:

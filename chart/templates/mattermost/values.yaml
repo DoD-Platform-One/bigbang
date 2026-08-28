@@ -11,7 +11,6 @@
 
 {{- define "bigbang.defaults.mattermost" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.mattermost.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $sentryEnabled := dig "mattermostEnvs" "MM_LOGSETTINGS_ENABLESENTRY" true .Values.addons.mattermost.values }}
 {{- /* External postgres is enabled when all database connection fields are provided */ -}}
 {{- $externalPostgresEnabled := and
@@ -34,15 +33,7 @@ image:
 {{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.addons.mattermost) "enabled") }}
 
 istio:
-  enabled: {{ $istioEnabled }}
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermost.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.mattermost.values .) }}
 
 {{- if $istioEnabled }}
 podAnnotations:
@@ -79,11 +70,7 @@ sso:
 {{- end }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
     from:
       mattermost:
         to:
@@ -104,7 +91,6 @@ networkPolicies:
             kubeAPI: true
       {{- end }}
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
     to:
       mattermost:8067:
         from:

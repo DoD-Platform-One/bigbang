@@ -16,7 +16,6 @@
 {{- end }}
 
 {{- define "bigbang.defaults.minio-operator" -}}
-{{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -44,9 +43,6 @@ upstream:
     {{- end }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
   egress:
     from:
       minio-operator:
@@ -55,16 +51,9 @@ networkPolicies:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
 
 istio:
-  enabled: {{ $istioEnabled }}
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
   console:
     gateways:
       - {{ include "getGatewayName" (dict "gateway" .Values.addons.minio.ingress.gateway "root" .)}}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.addons.minioOperator.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.addons.minioOperator.values .) }}
 
 routes:
   outbound:

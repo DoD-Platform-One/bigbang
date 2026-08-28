@@ -12,7 +12,6 @@
 {{- define "bigbang.defaults.twistlock" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioInjection := and $istioEnabled (ne (include "ambientEnabled" .) "true") (eq (dig "istio" "injection" "enabled" .Values.twistlock) "enabled") -}}
-{{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.twistlock.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
@@ -40,13 +39,7 @@ imagePullSecretName: ""
 {{- end }}
 
 networkPolicies:
-  enabled: {{ include "networkPoliciesEnabled" . }}
-  hbonePortInjection:
-    enabled: {{ include "ambientEnabled" . }}
-
   ingress:
-    definitions: {{ .Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
-
     to:
       twistlock-console:8081:
         from:
@@ -55,8 +48,6 @@ networkPolicies:
             monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ .Values.monitoring.enabled }}
 
   egress:
-    definitions: {{ .Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
-
     from:
       twistlock-console:
         to:
@@ -67,19 +58,7 @@ networkPolicies:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
 
 istio:
-  enabled: {{ $istioEnabled }}
-
-  sidecar:
-    enabled: {{ and $istioHardenedEnabled (ne (include "ambientEnabled" .) "true") }}
-
-  ambient:
-    enabled: {{ include "ambientEnabled" . }}
-
   injection: {{ ternary "enabled" "disabled" $istioInjection }}
-
-  authorizationPolicies:
-    enabled: {{ include "authorizationPoliciesEnabled" (list .Values.twistlock.values .) }}
-    generateFromNetpol: {{ include "authorizationPoliciesEnabled" (list .Values.twistlock.values .) }}
 
 routes:
   inbound:

@@ -3,7 +3,7 @@
 
 {{- /* Create secret */ -}}
 {{- if .Values.prometheusOperatorCRDs }}
-{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" "prometheus-operator-crds" "defaults" (include "bigbang.defaults.prometheus-operator-crds" .)) }}
+{{- include "values-secret" (dict "root" $ "package" (get .Values $pkg) "name" "prometheus-operator-crds" "defaults" (include "bigbang.defaults.prometheus-operator-crds" .) "injectCommonDefaults" false) }}
 {{- end }}
 
 {{- define "bigbang.defaults.prometheus-operator-crds" -}}
