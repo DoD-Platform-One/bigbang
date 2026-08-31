@@ -205,6 +205,7 @@ bbtests:
   cypress:
     envs:
       cypress_url: {{ printf "https://anchore.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.anchoreEnterprise "values" .Values) | nindent 6 }}
 
 sso:
   enabled: {{ .Values.addons.anchoreEnterprise.sso.enabled }}
