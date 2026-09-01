@@ -284,6 +284,7 @@ bbtests:
   cypress:
     envs:
       cypress_url: {{ printf "https://gitlab.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.gitlab "values" .Values) | nindent 6 }}
   scripts:
     envs:
       GITLAB_REGISTRY: registry.{{ $domainName }}
