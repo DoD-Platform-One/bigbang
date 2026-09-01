@@ -112,7 +112,7 @@ packages:
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/cloudnative-pg.git
       path: chart
-      tag: 0.29.0-bb.0
+      tag: 0.29.0-bb.1
     helmRelease:
       namespace: bigbang
     namespace:
@@ -263,7 +263,7 @@ packages:
                         app.kubernetes.io/version: "17"
                     spec:
                       instances: 1
-                      imageName: registry1.dso.mil/ironbank/opensource/postgres/postgresql:17.10
+                      imageName: registry1.dso.mil/ironbank/opensource/postgres/postgresql:17.11
                       imagePullSecrets:
                         - name: private-registry
                       postgresUID: 1001
@@ -358,7 +358,7 @@ packages:
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/redis.git
       path: chart
-      tag: 27.0.14-bb.0
+      tag: 28.0.6-bb.0
     helmRelease:
       namespace: bigbang
     namespace:
