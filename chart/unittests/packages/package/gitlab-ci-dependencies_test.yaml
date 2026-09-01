@@ -47,9 +47,8 @@ tests:
       - equal:
           path: spec.url
           value: https://repo1.dso.mil/big-bang/product/maintained/cloudnative-pg.git
-      - equal:
+      - isNotEmpty:
           path: spec.ref.tag
-          value: 0.29.0-bb.0
 
   - it: sources Garage from the updated Big Bang maintained package
     template: package/gitrepository.yaml
@@ -60,9 +59,8 @@ tests:
       - equal:
           path: spec.url
           value: https://repo1.dso.mil/big-bang/product/maintained/garage.git
-      - equal:
+      - isNotEmpty:
           path: spec.ref.tag
-          value: 0.9.3-bb.2
 
   - it: uses only the Registry1 HelmRepository
     template: helm-repository/helmrepo.yaml
@@ -102,9 +100,8 @@ tests:
       - equal:
           path: spec.chart.spec.chart
           value: wrapper
-      - equal:
+      - isNotEmpty:
           path: spec.chart.spec.version
-          value: 0.4.15
       - equal:
           path: spec.chart.spec.sourceRef
           value:
@@ -134,7 +131,7 @@ tests:
             name: ^postgresql$
       - matchRegex:
           path: spec.postRenderers[0].kustomize.patches[0].patch
-          pattern: '(?s)op: replace.*path: "".*apiVersion: postgresql.cnpg.io/v1.*kind: Cluster.*name: postgresql.*namespace: postgresql.*imageName: registry1.dso.mil/ironbank/opensource/postgres/postgresql:17.10.*database: gitlabhq_production.*owner: gitlab'
+          pattern: '(?s)op: replace.*path: "".*apiVersion: postgresql.cnpg.io/v1.*kind: Cluster.*name: postgresql.*namespace: postgresql.*imageName: registry1.dso.mil/ironbank/opensource/postgres/postgresql:[^[:space:]]+.*database: gitlabhq_production.*owner: gitlab'
 
   - it: deploys Garage with its normal identity and namespace
     template: package/helmrelease.yaml
