@@ -4,7 +4,7 @@ Date: 2025-03-11
 
 ## Status
 
-Accepted
+Superseded by [ADR 12: Standard Big Bang Package Architecture](./0012-standard-package-architecture.md)
 
 ## Context
 

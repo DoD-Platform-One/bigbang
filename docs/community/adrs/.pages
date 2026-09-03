@@ -11,3 +11,4 @@ nav:
   - 0009 Confidential: 0009-confidential.md
   - 0010 Upstream Values README Documentation: 0010-upstream-values-readme-documentation.md
   - 0011 Unified Package Configuration and Metadata: 0011-unified-package-configuration-and-metadata.md
+  - 0012 Standard Big Bang Package Architecture: 0012-standard-package-architecture.md
