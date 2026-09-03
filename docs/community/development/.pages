@@ -3,6 +3,7 @@ nav:
   - Package Lifecycle: package-lifecycle
   - Package Integration: package-integration
   - AWS K3d Script: aws-k3d-script.md
+  - Repository Agent Instructions: agent-instructions.md
   - CI Workflow: ci-workflow.md
   - Dev OCI Workflow: dev-oci-workflow.md
   - Develop Package: develop-package.md
