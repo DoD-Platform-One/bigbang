@@ -358,7 +358,7 @@ packages:
     git:
       repo: https://repo1.dso.mil/big-bang/product/maintained/redis.git
       path: chart
-      tag: 28.0.6-bb.0
+      tag: 28.0.10-bb.0
     helmRelease:
       namespace: bigbang
     namespace:
