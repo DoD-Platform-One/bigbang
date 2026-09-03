@@ -75,6 +75,10 @@ bbtests:
   scripts:
     envs:
       twistlock_host: {{ printf "https://twistlock.%s" $domainName | quote }}
+  cypress:
+    envs:
+      cypress_twistlock_url: {{ printf "https://twistlock.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.twistlock "values" .Values) | nindent 6 }}
 
 {{- if $istioEnabled }}
 annotations:

@@ -279,4 +279,10 @@ upstream:
     useEndpointGroup: true
     networkPolicy:
       enabled: false
+bbtests:
+  cypress:
+    envs:
+      cypress_thanos_url: https://thanos.{{ .Values.domain }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.thanos "values" .Values) | nindent 6 }}
+
 {{- end }}
