@@ -19,6 +19,7 @@
         "kind::maintenance",
         "kind::Tools & Automation"
     ],
+    "groupSingleUpdates": true,
     "packageRules": [
         {
             "matchDatasources": [
