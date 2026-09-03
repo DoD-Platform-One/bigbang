@@ -17,6 +17,10 @@ Join MatterMost channels to ask questions and communicate with the team. Here is
 
 [Set up a Development Environment](./development-environment.md).
 
+## Repository Agent Instructions
+
+[Write and maintain repository-specific agent instructions](./agent-instructions.md).
+
 ## Package Requirements
 
 [Big Bang Package Lifecycle: Onboarding](./package-lifecycle/onboarding.md) and [BBTOC Graduated Requirements](https://repo1.dso.mil/platform-one/bbtoc/-/tree/master/process#graduated-project-requirements)
