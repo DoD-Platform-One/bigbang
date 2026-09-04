@@ -11,16 +11,3 @@ addons:
     enabled: true
   headlamp:
     enabled: true
-
-# GitLab's HelmRelease dependsOn postgresql/redis/garage (and postgresql in turn
-# dependsOn cloudnative-pg), but tests/test-values.yaml ships all four disabled.
-# Without these the gitlab HelmRelease never reconciles.
-packages:
-  cloudnative-pg:
-    enabled: true
-  postgresql:
-    enabled: true
-  redis:
-    enabled: true
-  garage:
-    enabled: true

@@ -89,299 +89,6 @@ flux:
   upgrade:
     cleanupOnFail: false
 
-# GitLab 19 removed its bundled PostgreSQL, Redis, and MinIO charts. These
-# independent releases exist only for Big Bang's internal CI dependency
-# environment. CloudNativePG is the Big Bang maintained operator; the
-# PostgreSQL operand is one CNPG Cluster CR owned by a wrapper HelmRelease
-# after Flux post-rendering. These dependencies are not supported as consumer
-# development or production persistent storage. Consumers must manage external
-# PostgreSQL, Redis/Valkey, and S3 services.
-helmRepositories:
-  - name: registry1
-    repository: oci://registry1.dso.mil/bigbang
-    existingSecret: private-registry
-    type: oci
-    username: ""
-    password: ""
-    email: ""
-
-packages:
-  cloudnative-pg:
-    enabled: false
-    sourceType: git
-    git:
-      repo: https://repo1.dso.mil/big-bang/product/maintained/cloudnative-pg.git
-      path: chart
-      tag: 0.29.0-bb.1
-    helmRelease:
-      namespace: bigbang
-    namespace:
-      name: cloudnative-pg
-    istio:
-      # CNPG needs additional status services and DestinationRules before it can
-      # safely run with sidecars. Keep this CI dependency namespace unmeshed.
-      injection: disabled
-    bbCommonValues: true
-    passBigBangValues: true
-
-  garage:
-    enabled: false
-    sourceType: git
-    git:
-      repo: https://repo1.dso.mil/big-bang/product/maintained/garage.git
-      path: chart
-      tag: 0.9.3-bb.2
-    helmRelease:
-      namespace: bigbang
-    namespace:
-      name: garage
-    istio:
-      injection: disabled
-    bbCommonValues: true
-    values:
-      fullnameOverride: garage
-      bb-common:
-        istio:
-          # The Garage namespace is deliberately unmeshed in sidecar CI.
-          enabled: false
-          mtls:
-            mode: PERMISSIVE
-          sidecar:
-            enabled: false
-          authorizationPolicies:
-            enabled: false
-            generateFromNetpol: false
-        networkPolicies:
-          enabled: true
-          ingress:
-            defaults:
-              enabled: true
-            to:
-              garage-s3:3900:
-                podSelector:
-                  matchLabels:
-                    app.kubernetes.io/name: garage
-                    app.kubernetes.io/instance: garage
-                from:
-                  k8s:
-                    gitlab/*: true
-      garageInit:
-        enabled: true
-        zone: gitlab
-        capacityBytes: "10000000000"
-        region: garage
-        consumers:
-          - name: gitlab
-            buckets:
-              - git-lfs
-              - gitlab-agent-plan-content
-              - gitlab-artifacts
-              - gitlab-backups
-              - gitlab-ci-secure-files
-              - gitlab-dependency-proxy
-              - gitlab-mr-diffs
-              - gitlab-packages
-              - gitlab-pages
-              - gitlab-terraform-state
-              - gitlab-uploads
-              - registry
-              - runner-cache
-              - tmp
-            credentials:
-              accessKeyId: GKbb0000000000000000000000
-              secretAccessKey: bb00000000000000000000000000000000000000000000000000000000000000
-        adminToken: 271f33f02bf4a98f414d6c986ce51fb364eb6f4d249976097b72afee84b6802c
-      upstream:
-        fullnameOverride: garage
-        imagePullSecrets:
-          - name: private-registry
-        deployment:
-          replicaCount: 1
-        garage:
-          replicationFactor: "1"
-        persistence:
-          enabled: true
-          meta:
-            size: 1Gi
-          data:
-            size: 10Gi
-        environment:
-          - name: GARAGE_ADMIN_TOKEN
-            # Consumer credential Secrets intentionally exclude this admin token.
-            value: 271f33f02bf4a98f414d6c986ce51fb364eb6f4d249976097b72afee84b6802c
-
-  postgresql:
-    enabled: false
-    # The Big Bang wrapper is the package chart for this one-resource operand.
-    # Flux replaces its placeholder ConfigMap with the CNPG Cluster CR before
-    # Helm applies or records the release manifest.
-    sourceType: helmRepo
-    helmRepo:
-      repoName: registry1
-      chartName: wrapper
-      tag: 0.4.15
-    helmRelease:
-      namespace: bigbang
-    namespace:
-      name: postgresql
-    istio:
-      injection: disabled
-    passBigBangValues: true
-    bbCommonValues: false
-    dependsOn:
-      - name: cloudnative-pg
-        namespace: bigbang
-    flux:
-      timeout: 30m
-      waitStrategy:
-        name: poller
-      healthCheckExprs:
-        - apiVersion: postgresql.cnpg.io/v1
-          kind: Cluster
-          current: status.conditions.exists(e, e.type == 'Ready' && e.status == 'True')
-    postRenderers:
-      - kustomize:
-          patches:
-            - target:
-                group: ""
-                version: v1
-                kind: ConfigMap
-                name: ^postgresql$
-              patch: |-
-                - op: replace
-                  path: ""
-                  value:
-                    apiVersion: postgresql.cnpg.io/v1
-                    kind: Cluster
-                    metadata:
-                      name: postgresql
-                      namespace: postgresql
-                      labels:
-                        app.kubernetes.io/name: postgresql
-                        app.kubernetes.io/instance: postgresql
-                        app.kubernetes.io/managed-by: Helm
-                        app.kubernetes.io/version: "17"
-                    spec:
-                      instances: 1
-                      imageName: registry1.dso.mil/ironbank/opensource/postgres/postgresql:17.11
-                      imagePullSecrets:
-                        - name: private-registry
-                      postgresUID: 1001
-                      postgresGID: 1001
-                      storage:
-                        size: 8Gi
-                      resources:
-                        requests:
-                          cpu: "1"
-                          memory: 1Gi
-                        limits:
-                          cpu: "1"
-                          memory: 1Gi
-                      postgresql:
-                        parameters:
-                          max_connections: "200"
-                          shared_buffers: 256MB
-                        shared_preload_libraries:
-                          - pg_stat_statements
-                      bootstrap:
-                        initdb:
-                          database: gitlabhq_production
-                          owner: gitlab
-                          postInitApplicationSQL:
-                            - CREATE EXTENSION IF NOT EXISTS pg_trgm;
-                            - CREATE EXTENSION IF NOT EXISTS btree_gist;
-                            - CREATE EXTENSION IF NOT EXISTS plpgsql;
-                            - CREATE EXTENSION IF NOT EXISTS amcheck;
-                            - CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
-    values:
-      package:
-        name: postgresql
-        namespace:
-          name: postgresql
-        istio:
-          injection: disabled
-        network:
-          policies: true
-          defaultDeny: true
-          allowIntraNamespace: true
-          allowDnsEgress: true
-          additionalPolicies:
-            - name: allow-gitlab-postgresql
-              spec:
-                podSelector:
-                  matchLabels:
-                    cnpg.io/cluster: postgresql
-                policyTypes:
-                  - Ingress
-                ingress:
-                  - from:
-                      - namespaceSelector:
-                          matchLabels:
-                            kubernetes.io/metadata.name: gitlab
-                    ports:
-                      - protocol: TCP
-                        port: 5432
-            - name: allow-cloudnative-pg-status
-              spec:
-                podSelector:
-                  matchLabels:
-                    cnpg.io/cluster: postgresql
-                policyTypes:
-                  - Ingress
-                ingress:
-                  - from:
-                      - namespaceSelector:
-                          matchLabels:
-                            kubernetes.io/metadata.name: cloudnative-pg
-                    ports:
-                      - protocol: TCP
-                        port: 8000
-            - name: allow-cnpg-kube-api
-              spec:
-                podSelector:
-                  matchLabels:
-                    cnpg.io/cluster: postgresql
-                policyTypes:
-                  - Egress
-                egress:
-                  - to:
-                      - ipBlock:
-                          cidr: '{{ .Values.networkPolicies.controlPlaneCidr }}'
-        configMaps:
-          - name: postgresql
-            data:
-              placeholder: replaced-by-flux-post-renderer
-
-  redis:
-    enabled: false
-    sourceType: git
-    git:
-      repo: https://repo1.dso.mil/big-bang/product/maintained/redis.git
-      path: chart
-      tag: 28.0.10-bb.0
-    helmRelease:
-      namespace: bigbang
-    namespace:
-      create: false
-      createRegistrySecret: false
-      name: gitlab
-    bbCommonValues: true
-    values:
-      upstream:
-        architecture: standalone
-        auth:
-          enabled: true
-          usePasswordFiles: true
-        master:
-          persistence:
-            size: 256Mi
-        replica:
-          replicaCount: 0
-          autoscaling:
-            enabled: false
-        metrics:
-          enabled: false
-
 networkPolicies:
   enabled: true
   controlPlaneCidr: 172.16.0.0/12
@@ -391,6 +98,29 @@ istiod:
   values:
     hardened:
       enabled: true
+    istio:
+      serviceEntries:
+        custom:
+          - name: external-dependencies
+            spec:
+              hosts:
+                - external-dependencies.local
+              addresses:
+                - 172.30.0.0/16
+              exportTo:
+                - "*"
+              location: MESH_EXTERNAL
+              resolution: NONE
+              ports:
+                - name: tcp-garage
+                  number: 3900
+                  protocol: TCP
+                - name: tcp-postgresql
+                  number: 5432
+                  protocol: TCP
+                - name: tcp-valkey
+                  number: 6379
+                  protocol: TCP
 istioCNI:
   enabled: false
   values:
@@ -604,113 +334,6 @@ kyvernoPolicies:
       chainsawEnabled: false
       kyvernoCliEnabled: false
       legacyEnabled: true
-    # CI-only credential bridge. Dependency charts own the source Secrets;
-    # Kyverno synchronizes only the forms GitLab consumes into its namespace.
-    additionalPolicies:
-      sync-gitlab-ci-credentials:
-        enabled: true
-        kind: ClusterPolicy
-        annotations:
-          policies.kyverno.io/title: Sync GitLab CI dependency credentials
-          policies.kyverno.io/category: GitLab CI
-          policies.kyverno.io/subject: Secret
-        spec:
-          background: true
-          rules:
-            - name: sync-postgresql-credentials
-              match:
-                any:
-                  - resources:
-                      kinds:
-                        - Secret
-                      names:
-                        - postgresql-app
-                      namespaces:
-                        - postgresql
-                      operations:
-                        - CREATE
-                        - UPDATE
-              generate:
-                generateExisting: true
-                apiVersion: v1
-                kind: Secret
-                name: gitlab-database
-                namespace: gitlab
-                synchronize: true
-                clone:
-                  namespace: postgresql
-                  name: postgresql-app
-            - name: sync-garage-gitlab-credentials
-              match:
-                any:
-                  - resources:
-                      kinds:
-                        - Secret
-                      names:
-                        - garage-gitlab-credentials
-                      namespaces:
-                        - garage
-                      operations:
-                        - CREATE
-                        - UPDATE
-              context:
-                - name: garageAccessKey
-                  variable:
-                    jmesPath: request.object.data.accessKeyId | base64_decode(@)
-                - name: garageSecretKey
-                  variable:
-                    jmesPath: request.object.data.secretAccessKey | base64_decode(@)
-                - name: garageRails
-                  variable:
-                    value: |-
-                      provider: AWS
-                      region: garage
-                      aws_access_key_id: {{ garageAccessKey }}
-                      aws_secret_access_key: {{ garageSecretKey }}
-                      endpoint: "http://garage.garage.svc.cluster.local:3900"
-                      aws_signature_version: 4
-                      path_style: true
-                - name: garageRegistry
-                  variable:
-                    value: |-
-                      s3:
-                        bucket: registry
-                        accesskey: {{ garageAccessKey }}
-                        secretkey: {{ garageSecretKey }}
-                        regionendpoint: "http://garage.garage.svc.cluster.local:3900"
-                        secure: false
-                        region: garage
-                        v4auth: true
-                        pathstyle: true
-                - name: garageBackups
-                  variable:
-                    value: |-
-                      [default]
-                      access_key = {{ garageAccessKey }}
-                      secret_key = {{ garageSecretKey }}
-                      host_base = garage.garage.svc.cluster.local:3900
-                      host_bucket = garage.garage.svc.cluster.local:3900
-                      use_https = False
-                      bucket_location = garage
-                      multipart_chunk_size_mb = 128
-              generate:
-                generateExisting: true
-                apiVersion: v1
-                kind: Secret
-                name: gitlab-object-storage
-                namespace: gitlab
-                synchronize: true
-                data:
-                  apiVersion: v1
-                  kind: Secret
-                  metadata:
-                    name: gitlab-object-storage
-                    namespace: gitlab
-                  type: Opaque
-                  data:
-                    rails: '{{ garageRails | base64_encode(@) }}'
-                    registry: '{{ garageRegistry | base64_encode(@) }}'
-                    backups: '{{ garageBackups | base64_encode(@) }}'
     excludeContainers:
     - not-me
     - or-me
@@ -732,18 +355,6 @@ kyvernoPolicies:
     # Parameters are copied from kyverno policies for test vectors
     # Exclusions are for allowing other helm tests to function
     policies:
-      # CloudNativePG's operator and instance manager require Kubernetes API
-      # credentials; retain their service account tokens in this CI profile.
-      update-automountserviceaccounttokens:
-        namespaces:
-          - namespace: cloudnative-pg
-            pods:
-              allow:
-                - cloudnative-pg-*
-          - namespace: postgresql
-            pods:
-              allow:
-                - postgresql-*
       add-default-capability-drop:
         exclude:
           any:
@@ -1480,13 +1091,23 @@ addons:
 
   gitlab:
     enabled: false
-    dependsOn:
-      - name: postgresql
-        namespace: bigbang
-      - name: redis
-        namespace: bigbang
-      - name: garage
-        namespace: bigbang
+    dependsOn: []
+    database:
+      host: postgresql
+      port: 5432
+      database: gitlabhq_production
+      username: ci
+      password: ci-only-password
+    redis:
+      password: ci-only-password
+    objectStorage:
+      type: minio
+      endpoint: http://garage:3900
+      regionendpoint: http://garage:3900
+      region: garage
+      accessKey: GKbb0000000000000000000000
+      accessSecret: bb00000000000000000000000000000000000000000000000000000000000000
+      bucketPrefix: ci
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_gitlab
@@ -1494,86 +1115,29 @@ addons:
       timeout: 30m
     values:
       networkPolicies:
-        additionalPolicies:
-          - name: allow-external-dependencies
-            spec:
-              podSelector: {}
-              policyTypes:
-                - Egress
-              egress:
-                - to:
-                    - namespaceSelector:
-                        matchLabels:
-                          kubernetes.io/metadata.name: garage
-                  ports:
-                    - protocol: TCP
-                      port: 3900
-                - to:
-                    - namespaceSelector:
-                        matchLabels:
-                          kubernetes.io/metadata.name: postgresql
-                  ports:
-                    - protocol: TCP
-                      port: 5432
-                - to:
-                    - namespaceSelector:
-                        matchLabels:
-                          kubernetes.io/metadata.name: redis
-                  ports:
-                    - protocol: TCP
-                      port: 6379
+        enabled: true
+        egress:
+          from:
+            "*":
+              to:
+                cidr:
+                  172.30.0.0/16:3900: true
       global:
         redis:
-          host: redis-bb-master
+          host: valkey
           port: 6379
           auth:
             enabled: true
-            secret: redis-bb
-            key: redis-password
+            secret: gitlab-redis-secret-bb
+            key: secret
         psql:
-          host: postgresql-rw.postgresql.svc.cluster.local
+          host: postgresql
           port: 5432
           database: gitlabhq_production
-          username: gitlab
+          username: ci
           password:
             secret: gitlab-database
-            key: password
-        registry:
-          bucket: registry
-        appConfig:
-          object_store:
-            enabled: true
-            proxy_download: true
-            connection:
-              secret: gitlab-object-storage
-              key: rails
-          artifacts:
-            bucket: gitlab-artifacts
-          lfs:
-            bucket: git-lfs
-          uploads:
-            bucket: gitlab-uploads
-          packages:
-            bucket: gitlab-packages
-          externalDiffs:
-            bucket: gitlab-mr-diffs
-          terraformState:
-            bucket: gitlab-terraform-state
-          ciSecureFiles:
-            bucket: gitlab-ci-secure-files
-          dependencyProxy:
-            bucket: gitlab-dependency-proxy
-          agentPlanContent:
-            bucket: gitlab-agent-plan-content
-          backups:
-            bucket: gitlab-backups
-            tmpBucket: tmp
-        pages:
-          objectStore:
-            bucket: gitlab-pages
-        rails:
-          bootstrap:
-            enabled: false
+            key: PGPASSWORD
       upstream:
         gitlab-runner:
           resources:
