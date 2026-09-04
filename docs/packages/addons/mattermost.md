@@ -117,7 +117,7 @@ addons:
 
 ## Single Sign On (SSO)
 
-SSO is built in for Mattermost and Big Bang uses the [Gitlab SSO integration](https://docs.mattermost.com/deployment/sso-gitlab.html) as its implementation since this option is available at the free tier. Mattermost also provides OAuth and SAML integration as paid features for its [enterprise tiers](#licensing) if you wish to use those.
+SSO is built in for Mattermost and Big Bang uses the [Gitlab SSO integration](https://docs.mattermost.com/administration-guide/onboard/sso-gitlab.html) as its implementation since this option is available at the free tier. Mattermost also provides OAuth and SAML integration as paid features for its [enterprise tiers](#licensing) if you wish to use those.
 
 If using Big Bang's SSO implementation, Keycloak is used behind the scenes to "spoof" the way Gitlab interaction works for SSO. The set up for how to configure Keycloak to handle this is well documented via the [Mattermost docs](https://repo1.dso.mil/big-bang/product/packages/mattermost/-/blob/main/docs/keycloak.md).
 
@@ -134,7 +134,7 @@ addons:
 
 ## Licensing
 
-Big Bang deploys the free version of Mattermost by default, but there are two additional tiers of paid licenses for additional features. Pricing for these licenses is typically based upon number of users. Full details can be viewed on [Mattermost's tier page](https://docs.mattermost.com/overview/product.html). If you want to trial the E20 features you can request a trial via Mattermost's [request page](https://mattermost.com/trial/) or after deploying via the System Console you can begin a 30 day trial under the "Edition and License" page.
+Big Bang deploys the free version of Mattermost by default, but there are two additional tiers of paid licenses for additional features. Pricing for these licenses is typically based upon number of users. Full details can be viewed on [Mattermost's tier page](https://docs.mattermost.com/product-overview/editions-and-offerings.html). If you want to trial the E20 features you can request a trial via Mattermost's [request page](https://mattermost.com/trial/) or after deploying via the System Console you can begin a 30 day trial under the "Edition and License" page.
 
 ### Mattermost E10 Additional Features
 
@@ -205,4 +205,4 @@ addons:
 
 ## Dependencies
 
-Mattermost requires only database storage, file storage, and the mattermost operator by default the operator is bundled in Big Bang, and the database/file storage can also be provided in cluster via Big Bang or externalized (see the [storage section](#storage) above). No additional external dependencies are required, everything can be done via Big Bang. There is an optional dependency on Elasticsearch to provide optimized searches rather than using DB queries (E20 Enterprise license required) - see the official [Mattermost doc](https://docs.mattermost.com/deployment/elasticsearch.html) for more details.
+Mattermost requires only database storage, file storage, and the mattermost operator by default the operator is bundled in Big Bang, and the database/file storage can also be provided in cluster via Big Bang or externalized (see the [storage section](#storage) above). No additional external dependencies are required, everything can be done via Big Bang. There is an optional dependency on Elasticsearch to provide optimized searches rather than using DB queries (E20 Enterprise license required) - see the official [Mattermost doc](https://docs.mattermost.com/administration-guide/configure/environment-configuration-settings) for more details.
