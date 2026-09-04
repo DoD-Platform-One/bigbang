@@ -1563,7 +1563,27 @@
             {
               "$ref": "#/$defs/basePackage"
             }
-          ]
+          ],
+          "properties": {
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          }
         }
       }
     },
@@ -5627,7 +5647,6 @@
               "$ref": "#/$defs/packageAliasPartials/basePackage"
             }
           ],
-          "type": "object",
           "properties": {
             "git": {
               "$ref": "#/$defs/packageAliasPartials/git"
@@ -5657,12 +5676,31 @@
             "postRenderers": {
               "$ref": "#/$defs/packageAliasPartials/postRenderers"
             },
+            "dependsOn": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "namespace": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            },
             "enterprise": true,
             "kafkaIngestStorage": true,
             "minioObjectStorage": true,
             "s3ObjectStorage": true,
             "serviceAccountAnnotations": true
           },
+          "type": "object",
           "additionalProperties": false,
           "description": "Partial override merged over the built-in package's legacy defaults."
         },

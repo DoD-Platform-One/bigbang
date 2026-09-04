@@ -31,7 +31,7 @@ spec:
   {{- end }}
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "mimir" "root" .) | nindent 2 }}
 
-  {{- if or $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled }}
+  {{- if or $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled .Values.addons.minioOperator.enabled .Values.addons.mimir.dependsOn }}
   dependsOn:
   {{- if $istioEnabled }}
     {{- include "istioHelmReleases" . | nindent 4 }}
@@ -43,6 +43,9 @@ spec:
   {{- if .Values.addons.minioOperator.enabled }}
     - name: minio-operator
       namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- with .Values.addons.mimir.dependsOn }}
+  {{- toYaml . | nindent 4 }}
   {{- end }}
   {{- end }}
 {{- end }}

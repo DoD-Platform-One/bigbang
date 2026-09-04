@@ -30,3 +30,13 @@ tests:
     asserts:
       - failedTemplate:
           errorPattern: ".*"
+
+  - it: should fail validation when a Mimir dependency is missing its name
+    set:
+      addons:
+        mimir:
+          dependsOn:
+            - namespace: bigbang
+    asserts:
+      - failedTemplate:
+          errorPattern: ".*"
