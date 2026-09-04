@@ -1996,7 +1996,7 @@ addons:
       # -- Bucket name to use for Mattermost - will be auto-created.
       bucket: ""
 
-    # -- Mattermost Elasticsearch integration - requires enterprise E20 license - https://docs.mattermost.com/deployment/elasticsearch.html
+    # -- Mattermost Elasticsearch integration - requires enterprise E20 license - https://docs.mattermost.com/administration-guide/configure/environment-configuration-settings
     # Connection info defaults to the BB deployed Elastic, all values can be overridden via the "values" passthrough for other connections.
     # See values spec in MM chart "elasticsearch" yaml block - https://repo1.dso.mil/big-bang/product/packages/mattermost.git
     elasticsearch:
