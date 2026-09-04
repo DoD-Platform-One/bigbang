@@ -21,6 +21,10 @@ USE_WEAVE=false
 TERMINATE_INSTANCE=true
 QUIET=false
 K3D_TIMEOUT=300
+EXTERNAL_DEPENDENCIES=false
+EXTERNAL_DEPENDENCIES_ONLY=false
+K3D_DEV_POSTGRES_DATABASES="${K3D_DEV_POSTGRES_DATABASES:-gitlabhq_production,mattermost}"
+K3D_DEV_GARAGE_BUCKETS="${K3D_DEV_GARAGE_BUCKETS:-}"
 TMPDIR=$(mktemp -d)
 BASE_DOMAIN="dev.bigbang.mil"
 PUBLIC_SUBDOMAINS=( # Subdomains that use the public gateway by default
@@ -148,6 +152,10 @@ function process_arguments {
       INIT_SCRIPT=$1
       ;;
 
+    --external-dependencies)
+      EXTERNAL_DEPENDENCIES=true
+      ;;
+
     -H|--existing-public-ip)
       shift
       PublicIP=$1
@@ -238,6 +246,11 @@ function process_arguments {
       echo "                                  '--kube-apiserver-arg=foo=bar@server:0')"
       echo " -i|--init-script SCRIPTFILE      initialization script to pass to"
       echo "                                  instance before configuring it"
+      echo " --external-dependencies          start PostgreSQL, Garage, and Valkey"
+      echo "                                  beside k3d on a dedicated Docker network"
+      echo "                                  configure databases and add buckets with"
+      echo "                                  K3D_DEV_POSTGRES_DATABASES and"
+      echo "                                  K3D_DEV_GARAGE_BUCKETS"
       echo " -U|--ssh-username USERNAME       username to use when connecting"
       echo "                                  to existing system in -P (default"
       echo "                                  value depends on cloud provider,"
@@ -831,18 +844,43 @@ function install_kubectl {
   fi
 }
 
+function ensure_registry_credentials {
+  until [[ ${REGISTRY_USERNAME} ]]; do
+    read -p "Please enter your Registry1 username: " REGISTRY_USERNAME
+  done
+  until [[ ${REGISTRY_PASSWORD} ]]; do
+    read -s -p "Please enter your Registry1 password: " REGISTRY_PASSWORD
+    echo
+  done
+}
+
+function install_external_dependencies {
+  [[ "${EXTERNAL_DEPENDENCIES}" == "true" ]] || return
+
+  echo "Starting external PostgreSQL, Garage, and Valkey dependencies..."
+  ensure_registry_credentials
+  local quoted_username quoted_databases quoted_buckets
+  printf -v quoted_username '%q' "${REGISTRY_USERNAME}"
+  printf -v quoted_databases '%q' "${K3D_DEV_POSTGRES_DATABASES}"
+  printf -v quoted_buckets '%q' "${K3D_DEV_GARAGE_BUCKETS}"
+  printf '%s' "${REGISTRY_PASSWORD}" | run "docker login registry1.dso.mil --username ${quoted_username} --password-stdin"
+  scp -r -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes \
+    "${SCRIPT_DIR}/dependencies" "${SSHUSER}@${PublicIP}:/tmp/"
+
+  run_batch_new
+  run_batch_add "docker network inspect k3d-dependencies >/dev/null 2>&1 || docker network create --subnet 172.30.0.0/16 k3d-dependencies"
+  run_batch_add "for container in \$(docker ps --filter 'name=k3d-k3s-default-' --format '{{.Names}}'); do docker network connect k3d-dependencies \"\${container}\" 2>/dev/null || true; done"
+  run_batch_add "K3D_DEV_POSTGRES_DATABASES=${quoted_databases} K3D_DEV_GARAGE_BUCKETS=${quoted_buckets} /tmp/dependencies/manage.sh up"
+  run_batch_execute
+}
+
 function install_metallb {
   # Handle MetalLB cluster resource creation
   if [[ "${METAL_LB}" == true || "${ATTACH_SECONDARY_IP}" == true ]]; then
     echo "Installing MetalLB..."
     run_batch_new
   
-    until [[ ${REGISTRY_USERNAME} ]]; do
-      read -p "Please enter your Registry1 username: " REGISTRY_USERNAME
-    done
-    until [[ ${REGISTRY_PASSWORD} ]]; do
-      read -s -p "Please enter your Registry1 password: " REGISTRY_PASSWORD
-    done
+    ensure_registry_credentials
 
     scp -r -i ${SSHKEY} -o StrictHostKeyChecking=no -o IdentitiesOnly=yes ${SCRIPT_DIR}/metallb ${SSHUSER}@${PublicIP}:/tmp/
     
@@ -1399,7 +1437,7 @@ function cloud_aws_assign_ip_addresses
 function cluster_mgmt_select_action_for_existing {
   echo "💣 Big Bang Cluster Management 💣"
   PS3="Please select an option: "
-  options=("Re-create K3D cluster" "Recreate the cloud instance from scratch" "Do Nothing")
+  options=("Re-create K3D cluster" "Recreate the cloud instance from scratch" "Do Nothing" "Re-create external dependencies")
 
   select opt in "${options[@]}"; do
     case $opt in
@@ -1425,6 +1463,11 @@ function cluster_mgmt_select_action_for_existing {
     "Do Nothing")
       echo "Doing nothing..."
       exit 0
+      ;;
+    "Re-create external dependencies")
+      EXTERNAL_DEPENDENCIES=true
+      EXTERNAL_DEPENDENCIES_ONLY=true
+      break
       ;;
     *)
       echo "Invalid option. Please try again."
@@ -1460,6 +1503,7 @@ function cloud_aws_create_instances {
     if [[ "${CLOUD_RECREATE_INSTANCE}" == "true" ]]; then
       destroy_instances
     fi
+    [[ "${EXTERNAL_DEPENDENCIES_ONLY}" == "true" ]] && return
   fi
 
   if [[ "${RESET_K3D}" == false ]] ; then
@@ -1554,8 +1598,13 @@ function create_instances {
   if [[ "${PROVISION_CLOUD_INSTANCE}" == "true" ]]; then
     cloud_${CLOUDPROVIDER}_create_instances
   fi
+  if [[ "${EXTERNAL_DEPENDENCIES_ONLY}" == "true" ]]; then
+    install_external_dependencies
+    return
+  fi
   initialize_instance
   install_k3d
+  install_external_dependencies
   install_kubectl
   install_metallb
   fix_etc_hosts
