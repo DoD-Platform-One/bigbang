@@ -7,6 +7,3 @@ chart/values.yaml
 [Documentation] @chris.oconnell @andrewshoell @jeffv @chris1
 docs/
 *.md
-
-[Blog] @chris1
-blog/
