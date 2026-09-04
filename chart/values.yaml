@@ -279,11 +279,11 @@ istioCNI:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-cni.git
     path: "./chart"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istio-cni"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   # -- Values to passthrough to the Istio CNI chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio CNI Package
@@ -299,11 +299,11 @@ istioCRDs:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-crds.git
     path: "./chart"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istio-crds"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   # -- Values to passthrough to the Istio CRDs chart
   values: {}
   # -- Flux reconciliation overrides specifically for the Istio CRDs Package
@@ -352,11 +352,11 @@ istiod:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istiod.git
     path: "./chart"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "istiod"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   # -- Values to passthrough to the istiod chart
   values: {}
   # EXAMPLE: Use Tetrate's Enterprise FIPS compliant Istio image
@@ -390,11 +390,11 @@ istioGateway:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/istio-gateway.git
     path: "./chart"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "gateway"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   # -- Gateway chart values. Values under shared apply to every gateway; values under gateways.<name> override them.
   values: {}
   # EXAMPLE: Disable the wait job for every gateway except public
@@ -522,11 +522,11 @@ ztunnel:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/ztunnel.git
     path: "./chart"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   helmRepo:
     repoName: "registry1"
     chartName: "ztunnel"
-    tag: 1.30.3-bb.0
+    tag: 1.30.4-bb.0
   # -- Values to passthrough to the ztunnel chart
   values: {}
   # -- Flux reconciliation overrides specifically for the ztunnel Package
