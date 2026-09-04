@@ -412,6 +412,13 @@ kiali:
             # if enabling the keycloak SSO integration test, comment out or change strategy to "openid".
             # strategy defaults to "openid"
             strategy: "anonymous"
+    networkPolicies:
+      ingress:
+        to:
+          kiali:20001:
+            from:
+              k8s:
+                monitoring/*: true
     bbtests:
       enabled: true
 
