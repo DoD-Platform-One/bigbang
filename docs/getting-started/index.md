@@ -54,4 +54,4 @@ Continue with:
 - [Configuration](../configuration/) to manage Big Bang and package values.
 - [Operations](../operations/) for upgrades, backup, monitoring, and maintenance.
 - [Troubleshooting](../operations/troubleshooting/) when a Flux source or release is not ready.
-- [Frequently Asked Questions](faq.md) for licensing, support, and deployment boundaries.
+- [Frequently Asked Questions](../faq.md) for licensing, support, and deployment boundaries.

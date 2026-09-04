@@ -82,7 +82,7 @@ Optional Enterprise Feature: Mattermost can make use of Elastic for improved per
 
 ### Monitoring
 
-Monitoring is available within Mattermost as a paid (E20) feature. If you have both `addons.mattermost.enterprise` and `monitoring` enabled within Big Bang values a service monitor will be deployed to automatically ship metrics data to Prometheus for consumption.
+Monitoring is available within Mattermost as a paid feature — see [Licensing](#licensing) for current tier details. If you have both `addons.mattermost.enterprise` and `monitoring` enabled within Big Bang values a service monitor will be deployed to automatically ship metrics data to Prometheus for consumption.
 
 ### Health Checks
 
