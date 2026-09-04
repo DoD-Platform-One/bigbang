@@ -1,6 +1,7 @@
 nav:
   - Overview: index.md
   - Getting Started: getting-started
+  - FAQ: faq.md
   - Concepts: concepts
   - Installation: installation
   - Configuration: configuration
