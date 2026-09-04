@@ -59,6 +59,62 @@ tests:
   - isKind:
       of: HelmRelease
 
+- it: mimir should append custom HelmRelease dependencies
+  set:
+    addons:
+      mimir:
+        enabled: true
+        dependsOn:
+          - name: garage
+            namespace: bigbang
+      minioOperator:
+        enabled: false
+    istiod:
+      enabled: false
+    kyvernoPolicies:
+      enabled: false
+    monitoring:
+      enabled: false
+  template: mimir/helmrelease.yaml
+  asserts:
+  - lengthEqual:
+      path: spec.dependsOn
+      count: 1
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: garage
+        namespace: bigbang
+
+- it: mimir should preserve default dependencies when appending custom dependencies
+  set:
+    addons:
+      mimir:
+        enabled: true
+        dependsOn:
+          - name: garage
+            namespace: bigbang
+      minioOperator:
+        enabled: false
+    istiod:
+      enabled: false
+    kyvernoPolicies:
+      enabled: true
+    monitoring:
+      enabled: false
+  template: mimir/helmrelease.yaml
+  asserts:
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: garage
+        namespace: bigbang
+  - contains:
+      path: spec.dependsOn
+      content:
+        name: kyverno-policies
+        namespace: NAMESPACE
+
 - it: should configure Mimir to accept UTF-8 metric and label names
   set:
     addons:

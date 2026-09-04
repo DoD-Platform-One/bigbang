@@ -2424,6 +2424,12 @@ addons:
 
     postRenderers: []
 
+    # -- Additional HelmRelease dependencies. Use this for storage backends or
+    # operators that must be Ready before Mimir creates their custom resources.
+    dependsOn: []
+    # - name: garage
+    #   namespace: bigbang
+
     # -- Flux reconciliation overrides specifically for the Mimir Package
     flux: {}
 
