@@ -1,15 +1,16 @@
 nav:
-  - Istio Ambient Mode Now in Beta: istio-ambient-beta.md
-  - New Methodology for images.txt, package-images.yaml, oci_package_list.txt, and Others: images-v2-metadata-files.md
-  - Streamlining Integration with bb-common: streamlining-integration-with-bb-common.md
-  - Big Bang 3.0 - Overview of changes in Big Bang 3.0 Release: big-bang-3-0.md
-  - Big Bang 3.0 - Operatorless Istio Migration: bb-3-0-operatorless-istio-migration.md
-  - Introducing Headlamp a UI for your k8s Cluster management: UI-for-your-K8s-Cluster.md
-  - Kubernetes Management with Headlamp and the Flux Plugin: headlamp.md
-  - Cypress Testing In Depth: cypress-testing.md
-  - Big Bang 2.42 Release and Team Updates: 2-42-Release.md
-  - Big Bang 2.41 Release and Team Updates: 2-41-Release.md
-  - BigBang.mil Domain & dev Certificate: dev-bigbang-mil-certificate.md
-  - 2.0 New Features: 2-0-new-features.md
-  - 2.0 Breaking Changes: 2-0-breaking-changes.md
-  - Big Bang 2.0: big-bang-2-0.md
+  - Istio Ambient Mode in Big Bang (Beta): istio-ambient-beta.md
+  - Big Bang Image Metadata: From Cluster Scraping to Explicit Declarations: images-v2-metadata-files.md
+  - Streamlining Package Integration with bb-common: streamlining-integration-with-bb-common.md
+  - "Big Bang 3.0: Release Overview": big-bang-3-0.md
+  - "Big Bang 3.0: Operatorless Istio Migration": bb-3-0-operatorless-istio-migration.md
+  - Archive:
+      - Introducing Headlamp a UI for your k8s Cluster management: UI-for-your-K8s-Cluster.md
+      - Kubernetes Management with Headlamp and the Flux Plugin: headlamp.md
+      - Cypress Testing In Depth: cypress-testing.md
+      - Big Bang 2.42 Release and Team Updates: 2-42-Release.md
+      - Big Bang 2.41 Release and Team Updates: 2-41-Release.md
+      - BigBang.mil Domain & dev Certificate: dev-bigbang-mil-certificate.md
+      - 2.0 New Features: 2-0-new-features.md
+      - 2.0 Breaking Changes: 2-0-breaking-changes.md
+      - Big Bang 2.0: big-bang-2-0.md
