@@ -32,10 +32,6 @@ monitoring:
 istio:
   hardened:
     enabled: {{ $istioHardenedEnabled }}
-  authorizationPolicies:
-    additionalPolicies:
-      allow-ingress-to-external-secrets-webhook-tcp-port-10250-from-kube-api:
-        enabled: {{ $webhookEnabled }}
 
 networkPolicies:
   ingress:
