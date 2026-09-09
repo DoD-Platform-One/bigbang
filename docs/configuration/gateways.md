@@ -352,7 +352,7 @@ For more information on post-renderers, see
 ### Network Policies for Gateways
 
 Gateways deployed in the `istio-gateway` namespace use Big Bang's
-[bb-common network policy implementation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md)
+[bb-common network policy implementation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies.md)
 for automatic baseline network policy generation.
 
 #### Automatic NetworkPolicy Generation
@@ -485,7 +485,7 @@ needed for your use case.
 
 For more information on network policy configuration, see:
 
-- [bb-common Network Policy Implementation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md)
+- [bb-common Network Policy Implementation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies.md)
 
 ## TLS Modes
 
@@ -555,6 +555,6 @@ ranges.
 
 - [Istio Gateway Documentation](https://istio.io/latest/docs/reference/config/networking/gateway/)
 - [Istio Virtual Service Documentation](https://istio.io/latest/docs/reference/config/networking/virtual-service/)
-- [bb-common Network Policy Implementation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md)
+- [bb-common Network Policy Implementation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies.md)
 - [Big Bang Post Renderers Documentation](postrenderers.md)
 - [Big Bang Base Configuration Reference](base-config.md)

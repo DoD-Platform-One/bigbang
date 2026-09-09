@@ -29,7 +29,7 @@ dependencies:
 
 ### 2. Service Mesh Integration
 
-**See:** [bb-common Istio Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/istio) and [Routes Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/routes)
+**See:** [bb-common Istio Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/istio.md) and [Routes Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/routes.md)
 
 - Enable Istio sidecar injection on your namespace, not needed if deploying using Big Bang umbrella, i.e. `packages`
 - Use `{{- include "bb-common.istio.render" . }}` to render the configured PeerAuthentication, Sidecar, ServiceEntry, and AuthorizationPolicy resources
@@ -38,7 +38,7 @@ dependencies:
 
 ### 3. Network Policies
 
-**See:** [bb-common Network Policies Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/network-policies)
+**See:** [bb-common Network Policies Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies.md)
 
 - Use `{{- include "bb-common.network-policies.render" . }}` in templates
 - Configure `networkPolicies` values section
@@ -46,7 +46,7 @@ dependencies:
 
 ### 4. Authorization Policies
 
-**See:** [bb-common Authorization Policies Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/authorization-policies)
+**See:** [bb-common Authorization Policies Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/authorization-policies.md)
 
 - Configure authorization policies under `istio.authorizationPolicies`
 - Set `istio.authorizationPolicies.generateFromNetpol: true` to have `bb-common.network-policies.render` generate corresponding Istio `AuthorizationPolicy` resources from identity-bearing network-policy rules
@@ -60,4 +60,4 @@ Package charts should expose the current bb-common value structure described abo
 ## Additional Resources
 
 - [bb-common Main Documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs)
-- [bb-common Resource Graph](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/tree/main/docs/RESOURCE_GRAPH.md)
+- [bb-common Resource Graph](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/resource-graph.md)

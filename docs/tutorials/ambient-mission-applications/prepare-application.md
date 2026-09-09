@@ -9,7 +9,7 @@ This guide identifies the namespace, Kubernetes `NetworkPolicy`, and Istio `Auth
 - Enable ambient mode as described in [Configuring Istio Ambient Mode in Big Bang](../../configuration/ambient.md).
 - Identify the application's namespace, workload labels, service ports, metrics ports, ingress gateway, and required callers.
 - Determine the kubelet or node source CIDRs used for health probes on the target platform.
-- Prefer integrating the chart with [bb-common](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/INTEGRATION_GUIDE.md) when the chart can be modified.
+- Prefer integrating the chart with [bb-common](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/integration-guide.md) when the chart can be modified.
 
 ## Network Policy Requirements
 

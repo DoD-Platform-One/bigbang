@@ -5,7 +5,7 @@
 Big Bang enables Istio ambient mode for integrated packages by setting `istio.ambient.enabled` to `true`. Mission applications and external Helm charts can require additional namespace, network policy, and authorization policy configuration depending on how they are deployed and whether their chart uses [bb-common](../../community/development/package-integration/bb-common.md).
 
 > [!IMPORTANT]
-> Where possible, integrate the chart with [bb-common](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/INTEGRATION_GUIDE.md). The common library keeps service mesh, network policy, and authorization policy behavior aligned with Big Bang defaults and reduces hand-maintained manifests.
+> Where possible, integrate the chart with [bb-common](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/integration-guide.md). The common library keeps service mesh, network policy, and authorization policy behavior aligned with Big Bang defaults and reduces hand-maintained manifests.
 
 The tutorials use the Parabol community package as a representative mission application. Adjust namespaces, versions, storage, ports, selectors, and package values for the application and target cluster.
 
