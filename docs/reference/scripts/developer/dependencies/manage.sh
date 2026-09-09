@@ -1,7 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-POSTGRES_IMAGE="registry1.dso.mil/ironbank/opensource/postgres/postgresql:17.11"
+POSTGRES_IMAGE="registry1.dso.mil/ironbank/opensource/postgres/postgresql:18.4"
+POSTGRES_CRON_DATABASE="anchore"
 GARAGE_IMAGE="registry1.dso.mil/ironbank/opensource/deuxfleurs-org/garage:2.3.0"
 VALKEY_IMAGE="registry1.dso.mil/ironbank/afdco/valkey/valkey:9.0.4"
 
@@ -31,8 +32,10 @@ start_postgres() {
   docker rm -f "${name}" >/dev/null 2>&1 || true
   docker run -d --name "${name}" --network "${NETWORK}" --network-alias postgresql \
     --ip 172.30.0.10 -e POSTGRES_USER=ci -e POSTGRES_PASSWORD="${PASSWORD}" \
+    -e "POSTGRES_DB=${POSTGRES_CRON_DATABASE}" \
     -v "${name}-data:/var/lib/postgresql/data" "${POSTGRES_IMAGE}" \
-    -c max_connections=300 -c shared_preload_libraries=pg_stat_statements >/dev/null
+    -c max_connections=300 -c "shared_preload_libraries=pg_stat_statements,pg_cron" \
+    -c "cron.database_name=${POSTGRES_CRON_DATABASE}" -c cron.use_background_workers=on >/dev/null
   wait_for PostgreSQL docker exec "${name}" pg_isready -U ci
 }
 
@@ -47,6 +50,8 @@ provision_databases() {
       "SELECT 1 FROM pg_database WHERE datname = '${database}'" | grep -q 1 ||
       docker exec "${name}" createdb -U ci -O ci "${database}"
   done < <(printf '%s\n' "${K3D_DEV_POSTGRES_DATABASES}" | tr ',' '\n')
+  docker exec "${name}" psql -U ci -d "${POSTGRES_CRON_DATABASE}" -v ON_ERROR_STOP=1 \
+    -c 'CREATE EXTENSION IF NOT EXISTS pg_cron;' >/dev/null
 }
 
 start_garage() {
