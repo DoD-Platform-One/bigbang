@@ -155,7 +155,7 @@ policy restores default-deny; the HelmRelease prunes both on reconcile.
 ztunnel is L4 only, so L7 SSO enforcement (Authservice OIDC ext_authz) moves to a
 **waypoint**. bb-common auto-creates one per package when a route enables authservice in
 ambient mode. See
-[bb-common: Protecting a route with Authservice](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/routes/README.md#protecting-a-route-with-authservice-oidc-ext_authz).
+[bb-common: Protecting a route with Authservice](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/routes.md#protecting-a-route-with-authservice-oidc-ext_authz).
 
 ### `hostNetwork` workloads
 

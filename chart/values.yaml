@@ -181,7 +181,7 @@ networkPolicies:
   # Please review https://docs.aws.amazon.com/kms/latest/developerguide/kms-vpc-endpoint.html to setup routing to AWS services that never leave the AWS network.
   # Once created update `networkPolicies.vpcCidr` to match the CIDR of your VPC so Vault will be able to reach your VPCs DNS and new KMS endpoint.
   vpcCidr: 0.0.0.0/0
-  # bb-common-related values below; See [the documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies/README.md?ref_type=heads#definition-rules-definition)
+  # bb-common-related values below; See [the documentation](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/network-policies.md#definition-rules-definition)
   # for more details.
   egress:
     # -- Egress definitions; create definitions here that you want to re-use globally across
