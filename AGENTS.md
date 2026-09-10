@@ -69,11 +69,12 @@ The bootstrap Kustomization installs this chart as a Flux HelmRelease. The chart
 - This repository owns package enablement, source pins, dependency ordering, global-to-package value mapping, and umbrella integration.
 - The upstream project owns the complete product and upstream chart configuration surface.
 
-For upstream passthrough configuration, document only the parent entry point and link to version-appropriate upstream values. Do not copy nested upstream keys into umbrella or package documentation.
+For upstream passthrough configuration, document only the parent entry point and link to version-appropriate upstream values. Do not copy nested upstream keys into umbrella or package documentation. Do not set values under an `upstream` key when they only restate the upstream chart's default; include them only when Big Bang must override that default.
 
 ## Upgrade and Release Workflow
 
 - Normal merge requests do not change `chart/Chart.yaml`'s version; umbrella releases follow the [release schedule](README.md#release-schedule).
+- Do not update `CHANGELOG.md` in a merge request; the release process manages changelog entries.
 - Merge request CI tests clean install and upgrade from `master`. Protected tags trigger artifact preparation, signing, and publication through the [CI workflow](docs/community/development/ci-workflow.md).
 
 ## Integration Test Environment

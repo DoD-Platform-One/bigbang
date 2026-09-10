@@ -138,7 +138,7 @@ Apply these linking rules:
 - Label retained historical guidance with its applicable version or migration path.
 - Correct `AGENTS.md` when it conflicts with an authoritative source; do not preserve compatibility with stale prose.
 
-For passthrough values, follow [ADR 10](../adrs/0010-upstream-values-readme-documentation.md): document the upstream parent entry point, link to the applicable upstream `values.yaml`, and do not copy nested upstream keys, defaults, or descriptions. Keep Big Bang-owned values documented individually.
+For passthrough values, follow [ADR 10](../adrs/0010-upstream-values-readme-documentation.md): document the upstream parent entry point, link to the applicable upstream `values.yaml`, and do not copy nested upstream keys, defaults, or descriptions. Do not set values under an `upstream` key merely to restate an upstream chart default; set them only when Big Bang must override that default. Keep Big Bang-owned values documented individually.
 
 ## Repository Profiles
 
