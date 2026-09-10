@@ -111,4 +111,4 @@ fallback no longer justifies its maintenance cost.
 
 - [Configuring Istio Ambient Mode](../../configuration/ambient.md)
 - [Migrating from Sidecar Mode to Ambient Mode](../../migration/migrating-istio-to-ambient.md)
-- [Istio Ambient Mesh in Big Bang: From Beta to GA](../../../blog/istio-ambient-beta.md)
+- [Istio Ambient Mesh in Big Bang: From Beta to GA](../../../blog/posts/istio-ambient-beta.md)

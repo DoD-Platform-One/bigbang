@@ -1,4 +1,7 @@
 ---
+title: Big Bang 2.0
+date: 2023-03-30
+description: Learn why Big Bang 2.0 was created and what changed in the platform's second major release.
 revision_date: Last edited April 13, 2023
 tags:
   - blog
@@ -7,6 +10,8 @@ tags:
 # Big Bang 2.0
 
 What is Big Bang 2.0? Why are we doing it? 2.0 is the second major release since Big Bang 1.0 released in December 2020. This blog post should provide you with both the why behind what we're doing, as well as what the changes involved are, and what that means for you as a user.
+
+<!-- more -->
 
 ## Why Change Things?
 
@@ -39,7 +44,7 @@ Once again - these will be *small* breaking changes to user values and potential
 
 With 2.0 we will be providing a way to deploy community/arbitrary packages as part of Big Bang and as a "first-class" experience. This will provide a way for users to effectively extend Big Bang, and still have the lifecycle of additional packages tied to the Big Bang deployment directly. Beyond this, there will also be a new `wrapper` provided that offers some features for integration of an application inside of Big Bang, strictly via Big Bang values. This includes things like configuring `VirtualService`, `ServiceMonitor`, and `NetworkPolicy` resources.
 
-For additional details on what this looks like from a user/values perspective, read the [extra package deployment guide](../docs/installation/environments/extra-package-deployment.md). This will be provided as a new feature, and not change any existing architecture/functionality.
+For additional details on what this looks like from a user/values perspective, read the [extra package deployment guide](../../docs/installation/environments/extra-package-deployment.md). This will be provided as a new feature, and not change any existing architecture/functionality.
 
 ### Upgrade Process Improvements
 

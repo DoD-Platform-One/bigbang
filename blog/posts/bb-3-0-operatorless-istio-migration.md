@@ -1,3 +1,11 @@
+---
+title: "Big Bang 3.0: Operatorless Istio Migration"
+date: 2025-03-17
+description: Understand why Big Bang moved from the Istio Operator to direct Helm-based Istio deployments.
+tags:
+  - blog
+---
+
 # Big Bang 3.0 - Operatorless Istio Migration
 
 It has been nearly two years since the Big Bang 2.0 release, and the project has
@@ -7,6 +15,8 @@ feedback have been essential in shaping the platform your missions rely on.
 
 In line with our mission-first principles, we want to share updates on the
 direction of Big Bang and what it means for you as Big Bang operators.
+
+<!-- more -->
 
 ## Istio operator deprecation
 
@@ -109,7 +119,7 @@ when we have a clear path for ambient mode, we’ll share updates.
 ✅ **Review your Gateway configurations and prepare for standalone Helm-based
 deployment.**
 
-✅ **Keep an eye out for [migration documentation](../docs/migration/migrating-istio-for-bb3.0.md) and automation tools.**
+✅ **Keep an eye out for [migration documentation](../../docs/migration/migrating-istio-for-bb3.0.md) and automation tools.**
 
 ✅ **Engage with the community to provide feedback or raise concerns.**
 

@@ -1,4 +1,7 @@
 ---
+title: Cypress Testing In-Depth
+date: 2024-04-02
+description: Learn how to configure, run, and debug custom Cypress tests in a Big Bang environment.
 revision_date: Last edited April 2, 2024
 tags:
   - blog
@@ -8,7 +11,9 @@ tags:
 
 ## Introduction
 
-The intent of this post is to build off the existing Cypress Testing documentation [here](../docs/concepts/testing.md) and go a bit deeper into how it can be leveraged in a real-world environment. We will also go a bit deeper into Cypress specific configuration settings, running/debugging tests, and cover some of the basics of Cypress.
+The intent of this post is to build off the existing Cypress Testing documentation [here](../../docs/concepts/testing.md) and go a bit deeper into how it can be leveraged in a real-world environment. We will also go a bit deeper into Cypress specific configuration settings, running/debugging tests, and cover some of the basics of Cypress.
+
+<!-- more -->
 
 ## Environment Overview
 
@@ -247,4 +252,3 @@ The easiest way to start on writing a Cypress test is to simply browse around wi
 ## Wrap Up
 
 Cypress can be a powerful testing tool for your arsenal when used properly and now that users can now add in their own tests, it can easily be tailored to fit more specific situations. Getting everything deployed in Big Bang is nice, but having confidence that it's all working as expected is even better! 🙂
-

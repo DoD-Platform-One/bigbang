@@ -1,8 +1,18 @@
+---
+title: "Big Bang 4.0: Release Overview"
+date: 2026-09-10
+description: Preview the service mesh, package integration, configuration, and policy changes planned for Big Bang 4.0.
+tags:
+  - blog
+---
+
 # Big Bang 4.0: The Next Evolution of the Platform
 
 Big Bang 4.0 is planned for October 2026. This release brings together sustained
 work across the Big Bang value stream to make secure Kubernetes platforms
 easier to operate, configure, and extend.
+
+<!-- more -->
 
 Many of these capabilities were introduced, evaluated, and refined throughout
 the Big Bang 3.x lifecycle. Big Bang 4.0 marks the point where that work comes
@@ -59,7 +69,7 @@ uncovers an Ambient issue, sidecar mode provides a supported escape hatch while
 that issue is addressed. Maintaining both modes adds development and testing
 cost, so Big Bang may reconsider sidecar support in a future release through a
 separate deprecation decision. Read
-[ADR 13](../docs/community/adrs/0013-retain-istio-sidecar-support-in-big-bang-4.md)
+[ADR 13](../../docs/community/adrs/0013-retain-istio-sidecar-support-in-big-bang-4.md)
 for the complete decision.
 
 Authservice is also supported with Ambient through waypoint proxies, which
@@ -73,7 +83,7 @@ this route-scoped waypoint model for SSO-protected services.
 
 Read the [Ambient Mesh adoption overview](./istio-ambient-beta.md) to learn more
 about the architecture, or consult the
-[Ambient migration guide](../docs/migration/migrating-istio-to-ambient.md) for
+[Ambient migration guide](../../docs/migration/migrating-istio-to-ambient.md) for
 detailed preparation and compatibility information.
 
 ## A Shared Integration Foundation with `bb-common`
@@ -131,7 +141,7 @@ Bang-specific behavior, and a common dependency model across the package
 ecosystem. It also brings integrated packages into alignment with the subchart
 model already used by team-maintained packages. The complete architectural
 decision is recorded in
-[ADR 14](../docs/community/adrs/0014-consume-bb-common-as-a-helm-subchart.md).
+[ADR 14](../../docs/community/adrs/0014-consume-bb-common-as-a-helm-subchart.md).
 
 During the transition, the umbrella chart merges common defaults with user
 overlays and supplies the correct values shape for each package. Packages that
@@ -144,7 +154,7 @@ the standard subchart model consistently.
 This transition changes the values shape for these packages, so existing users
 will need to migrate their package overrides. For the 4.0 upgrade, users will be
 able to use Big Bang's
-[3-to-4 values migration script](../scripts/migrate-values-3-to-4.sh) for both
+[3-to-4 values migration script](../../scripts/migrate-values-3-to-4.sh) for both
 breaking configuration changes. In one migration, the script will move legacy
 top-level and `addons.<name>` package configuration into the consistent
 `packages.<name>` map and rewrite integrated and team-maintained package
@@ -222,9 +232,9 @@ Users can adopt the unified contract during the 3.x lifecycle with
 `packageConfiguration.version: v1`. In Big Bang 4.0, `v1` becomes the default
 and supported package contract, and the legacy top-level and `addons.<name>`
 package paths are removed. Read
-[ADR 11](../docs/community/adrs/0011-unified-package-configuration-and-metadata.md)
+[ADR 11](../../docs/community/adrs/0011-unified-package-configuration-and-metadata.md)
 for the design decision and the
-[package values migration guide](../docs/migration/migrating-package-values-for-bb4.0.md)
+[package values migration guide](../../docs/migration/migrating-package-values-for-bb4.0.md)
 when preparing existing configuration.
 
 ## Kyverno Policies Move to CEL

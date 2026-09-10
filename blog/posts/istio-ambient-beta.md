@@ -1,9 +1,19 @@
+---
+title: Istio Ambient Mode in Big Bang (Beta)
+date: 2026-04-29
+description: Learn how Big Bang adopted Istio Ambient Mesh and how to prepare for its default use in Big Bang 4.0.
+tags:
+  - blog
+---
+
 # Istio Ambient Mesh in Big Bang: From Beta to GA
 
 > **Update:** Istio Ambient Mesh reached General Availability in Big Bang 3.32.
 > It remains opt-in throughout Big Bang 3.x and becomes the default Istio
 > configuration in Big Bang 4.0. Users are encouraged to begin migrating and
 > validating their mission environments before the 4.0 upgrade.
+
+<!-- more -->
 
 Big Bang 3.23 introduced support for **Istio Ambient Mesh** as an opt-in beta
 feature. Ambient mode reached General Availability in Big Bang 3.32 while
