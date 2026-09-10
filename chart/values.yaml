@@ -7,7 +7,7 @@ istio:
   ambient:
     # -- Enable Istio ambient mesh mode. When true, uses ztunnel for mTLS instead of sidecars.
     # This automatically enables istioCNI, ztunnel, and gatewayAPI packages.
-    # NOTE: Ambient mode is currently in an alpha state.
+    # NOTE: Ambient mode is generally available as of Big Bang 3.32. It remains opt-in in 3.x and becomes the default in 4.0.
     enabled: false
 
 # -- Prevent Big Bang from creating GitRepository resources. HelmReleases configured with Git sources

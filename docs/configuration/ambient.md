@@ -1,6 +1,9 @@
 # Configuring Istio Ambient Mode in Big Bang
 
-> **WARNING:** Ambient mode is currently in an **beta state** within Big Bang. It is not fully integrated and is **not recommended for production use**. Expect potential breaking changes in future releases.
+> **NOTE:** Ambient mode is generally available as of Big Bang 3.32. It remains
+> opt-in throughout Big Bang 3.x and becomes the default Istio configuration in
+> Big Bang 4.0. Begin migrating before 4.0 and validate mission-specific traffic
+> and integrations in a development or test environment before production.
 >
 > **NOTE:** When `istio.ambient.enabled` is set to `true`, Big Bang deploys the required ambient infrastructure (ztunnel, istio-cni, gateway-api) and automatically opts all packages into ambient mode by applying the `istio.io/dataplane-mode: ambient` label to their namespaces.
 

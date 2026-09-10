@@ -12,3 +12,5 @@ nav:
   - 0010 Upstream Values README Documentation: 0010-upstream-values-readme-documentation.md
   - 0011 Unified Package Configuration and Metadata: 0011-unified-package-configuration-and-metadata.md
   - 0012 Standard Big Bang Package Architecture: 0012-standard-package-architecture.md
+  - 0013 Retain Istio Sidecar Support in Big Bang 4.0: 0013-retain-istio-sidecar-support-in-big-bang-4.md
+  - 0014 Consume bb-common as a Helm Subchart: 0014-consume-bb-common-as-a-helm-subchart.md
