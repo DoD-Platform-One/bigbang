@@ -171,6 +171,6 @@ performing any package-specific migration.
 
 - [ADR 11: Unified Package Configuration and Package Metadata](./0011-unified-package-configuration-and-metadata.md)
 - [ADR 12: Standard Big Bang Package Architecture](./0012-standard-package-architecture.md)
-- [`bb-common` integration overview](../../../blog/streamlining-integration-with-bb-common.md)
+- [`bb-common` integration overview](../../../blog/posts/streamlining-integration-with-bb-common.md)
 - [`bb-common` integration guide for application owners](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/INTEGRATION_GUIDE.md?ref_type=heads)
 - [Migrating package values for Big Bang 4.0](../../migration/migrating-package-values-for-bb4.0.md)

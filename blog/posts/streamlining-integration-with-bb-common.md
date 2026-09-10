@@ -1,3 +1,11 @@
+---
+title: Streamlining Package Integration with bb-common
+date: 2025-10-21
+description: Learn how bb-common standardizes secure network-policy integration across Big Bang packages.
+tags:
+  - blog
+---
+
 # Streamlining Integration with [`bb-common`](https://repo1.dso.mil/big-bang/product/packages/bb-common)
 
 ## Setting the stage
@@ -10,6 +18,8 @@ policies**.
 Until now, each Big Bang package tended to define its own policies in slightly
 different ways. The result? Inconsistency, duplication, and confusion — both for
 contributors and for engineers trying to consume Big Bang downstream.
+
+<!-- more -->
 
 ## The Problem with Inconsistency
 

@@ -1,8 +1,18 @@
+---
+title: Kubernetes Management with Headlamp and the Flux Plugin
+date: 2025-05-22
+description: Learn how Headlamp and its Flux plugin simplify Kubernetes and GitOps management in Big Bang.
+tags:
+  - blog
+---
+
 # Simplifying Kubernetes Management with Headlamp (and the Flux Plugin)
 
 Kubernetes has become the go-to orchestration system for containerized applications, but managing it isn’t always user-friendly. Command-line tools like kubectl are powerful, but not ideal for everyone especially for those who prefer visual insights or need to onboard new team members. This is where Headlamp comes into play.
 
 In this post, we’ll break down what Headlamp is, how it’s used, highlight its top features, and dive into its Flux plugin for GitOps integration.
+
+<!-- more -->
 
 ## What is Headlamp?
 

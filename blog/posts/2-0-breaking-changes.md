@@ -1,4 +1,7 @@
 ---
+title: Breaking Changes in Big Bang 2.0
+date: 2023-04-13
+description: Prepare for the value-key, namespace, and package changes introduced in Big Bang 2.0.
 revision_date: Last edited April 14, 2023
 tags:
   - blog
@@ -7,6 +10,8 @@ tags:
 # Breaking Changes in Big Bang 2.0
 
 This is part 2 in a series of Big Bang 2.0 blog posts. If you haven't already, read through part 1 [here](./big-bang-2-0.md) which provides some backstory on why the team thought 2.0 was necessary and what changes are included. This post will dive more into the specific breaking changes and how these will affect you as a user.
+
+<!-- more -->
 
 ## Values Key Changes
 

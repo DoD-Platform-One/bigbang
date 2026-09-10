@@ -1,4 +1,7 @@
 ---
+title: New Features in Big Bang 2.0
+date: 2023-04-13
+description: Explore package extensibility, OCI Helm repositories, and automated updates in Big Bang 2.0.
 revision_date: Last edited April 13, 2023
 tags:
   - blog
@@ -8,9 +11,11 @@ tags:
 
 This is part 3 in a series of Big Bang 2.0 blog posts. If you haven't already, read through part 1 [here](./big-bang-2-0.md) which provides some backstory on 2.0 and part 2 [here](./2-0-breaking-changes.md) which will get you prepared for the breaking changes in 2.0. This post will dive more into some of the new features releasing with 2.0.
 
+<!-- more -->
+
 ## Package Extensibility
 
-As mentioned in the first post in this series, 2.0 will provide new extensibility for deploying additional packages (beyond what is providing in Big Bang core/addons). The ["extra package deployment guide"](../docs/installation/environments/extra-package-deployment.md) provides a lot of details on what is included and how to use it, so we won't reproduce all of that here. As a teaser for that more extensive document, 2.0 provides a new way to deploy extra packages, as seen in the example below which deploys podinfo directly from the GitHub source:
+As mentioned in the first post in this series, 2.0 will provide new extensibility for deploying additional packages (beyond what is providing in Big Bang core/addons). The ["extra package deployment guide"](../../docs/installation/environments/extra-package-deployment.md) provides a lot of details on what is included and how to use it, so we won't reproduce all of that here. As a teaser for that more extensive document, 2.0 provides a new way to deploy extra packages, as seen in the example below which deploys podinfo directly from the GitHub source:
 
 ```yaml
 packages:
@@ -52,4 +57,4 @@ Why should you be interested in switching? Big Bang is currently publishing all 
 
 ## Renovate for Upgrades
 
-The last feature we want to highlight in this post is the new inclusion of Renovate for upgrades. This again is pretty well laid out in existing documentation [here](../docs/operations/maintenance/renovate.md) so we won't dive too deep into configurations and how to use it in this post. We encourage you to take a look at that deployment document and explore the [package itself](https://repo1.dso.mil/big-bang/product/packages/renovate) to see how it might help you with updates. We've also updated the [customer template repo](https://repo1.dso.mil/big-bang/customers/template) with a sample Renovate config to show how it could be used directly in a config repo.
+The last feature we want to highlight in this post is the new inclusion of Renovate for upgrades. This again is pretty well laid out in existing documentation [here](../../docs/operations/maintenance/renovate.md) so we won't dive too deep into configurations and how to use it in this post. We encourage you to take a look at that deployment document and explore the [package itself](https://repo1.dso.mil/big-bang/product/packages/renovate) to see how it might help you with updates. We've also updated the [customer template repo](https://repo1.dso.mil/big-bang/customers/template) with a sample Renovate config to show how it could be used directly in a config repo.

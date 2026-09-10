@@ -1,6 +1,16 @@
+---
+title: "Big Bang 3.0: Release Overview"
+date: 2025-06-02
+description: Explore the major platform, security, package, and operational changes delivered in Big Bang 3.0.
+tags:
+  - blog
+---
+
 # Big Bang 3.0 💥
 
 The countdown is on! Big Bang 3.0 is on track for release on June 13, 2025. This marks the next major release since version 2.0 in April 2023, and the Big Bang team has been working diligently to deliver a platform that's secure, feature-rich, and ready for your most critical missions. The Big Bang universe is ever-expanding, read on to learn more!
+
+<!-- more -->
 
 ## Changes
 
@@ -10,7 +20,7 @@ Service mesh management receives a major upgrade in 3.0 with the **removal of th
 
 By migrating to direct Helm deployments, Big Bang adopts recommended practices for Istio management and improves its overall security posture through the removal of the high-privilege operator. This transition also offers a standardized and more secure method for managing Istio installation and upgrades while laying the foundation for [Ambient Mode](https://istio.io/latest/docs/ambient/overview/) integration in future releases.
 
-Be advised, **this is a breaking change**, but our engineers have worked hard to make the migration as straightforward as possible for our community. For step-by-step instructions and insights, please refer to our dedicated Operatorless Istio [blog post](./bb-3-0-operatorless-istio-migration.md) and our detailed [migration guide](../docs/migration/migrating-istio-for-bb3.0.md). To ensure a seamless transition, users are strongly encouraged to begin the migration process now. Operatorless Istio reached General Availability in Big Bang versions 2.53 and 2.54.
+Be advised, **this is a breaking change**, but our engineers have worked hard to make the migration as straightforward as possible for our community. For step-by-step instructions and insights, please refer to our dedicated Operatorless Istio [blog post](./bb-3-0-operatorless-istio-migration.md) and our detailed [migration guide](../../docs/migration/migrating-istio-for-bb3.0.md). To ensure a seamless transition, users are strongly encouraged to begin the migration process now. Operatorless Istio reached General Availability in Big Bang versions 2.53 and 2.54.
 
 ### 🧰 Grafana Alloy Replaces Promtail
 

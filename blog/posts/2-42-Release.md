@@ -1,4 +1,7 @@
 ---
+title: "Big Bang Release 2.42.0: Engineering Progress and Strategic Innovations"
+date: 2024-12-19
+description: Review the security, observability, storage, and operational improvements in Big Bang 2.42.0.
 revision_date: Last edited December 19, 2024
 tags:
   - blog
@@ -7,6 +10,8 @@ tags:
 # Big Bang Release 2.42.0: Engineering Progress and Strategic Innovations
 
 We are thrilled to announce the release of Big Bang 2.42.0, marking another significant step forward in our enterprise platform development journey. This incremental release brings substantial improvements to stability, security, and core functionality across our component ecosystem.
+
+<!-- more -->
 
 ## Release Highlights
 
