@@ -4,6 +4,7 @@ nav:
   - "Streamlining Package Integration with bb-common": streamlining-integration-with-bb-common.md
   - "Big Bang 3.0: Release Overview": big-bang-3-0.md
   - "Big Bang 3.0: Operatorless Istio Migration": bb-3-0-operatorless-istio-migration.md
+  - "Big Bang 4.0: Release Overview": big-bang-4-0.md
   - Archive:
       - "Introducing Headlamp a UI for your k8s Cluster management": UI-for-your-K8s-Cluster.md
       - "Kubernetes Management with Headlamp and the Flux Plugin": headlamp.md

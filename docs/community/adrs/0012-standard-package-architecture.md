@@ -39,6 +39,14 @@ When no suitable upstream Helm chart exists, a package may maintain application 
 
 ### Common Big Bang resources
 
+> **Partially superseded:** [ADR 14](./0014-consume-bb-common-as-a-helm-subchart.md)
+> supersedes the consumption-model details in this subsection. For Big Bang
+> 4.0, integrated and team-maintained packages consume `bb-common` as a regular
+> subchart, scope its values under `bb-common`, and no longer call its render
+> interfaces from thin wrapper templates. The remaining decisions in this
+> subsection, including `bb-common` ownership of shared behavior and package
+> ownership of package-specific configuration, remain in effect.
+
 Package charts will use `bb-common` as the standard implementation for supported Big Bang security and networking resources. A package integrating with those capabilities will:
 
 - declare `bb-common` as a Helm dependency;
