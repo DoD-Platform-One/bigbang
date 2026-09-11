@@ -11,7 +11,7 @@
               spec:
                 initContainers:
                   - name: mysql-wait
-                    image: "registry1.dso.mil/ironbank/bitnami/mysql8:8.0.36-debian-11-r1"
+                    image: "registry1.dso.mil/ironbank/opensource/mysql/mysql8:8.4.11"
                     imagePullPolicy: IfNotPresent
                     command:
                       - sh
@@ -38,8 +38,8 @@
                         drop: ["ALL"]
                       readOnlyRootFilesystem: false
                       runAsNonRoot: true
-                      runAsUser: 1001
-                      runAsGroup: 1001
+                      runAsUser: 27
+                      runAsGroup: 27
         target:
           kind: StatefulSet
           name: .*-webapp$

@@ -1066,7 +1066,7 @@ addons:
           datasourceProperties:
             db.username: root
             db.password: password
-            jdbc.url: 'jdbc:mysql://fortify-mysql:3306/ssc_db?sessionVariables=collation_connection=latin1_general_cs&rewriteBatchedStatements=true'
+            jdbc.url: 'jdbc:mysql://fortify-mysql:3306/ssc_db?sessionVariables=collation_connection=latin1_general_cs&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true'
           dbMigrationProperties:
             migration.enabled: true
             migration.username: root
