@@ -1,3 +1,4 @@
 nav:
   - Overview: index.md
   - Renovate: renovate.md
+  - Renovate Maintenance: renovate-maintenance.md
