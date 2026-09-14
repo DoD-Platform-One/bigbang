@@ -1232,6 +1232,24 @@ addons:
 
   anchoreEnterprise:
     enabled: false
+    database:
+      username: ci
+      password: ci-only-password
+      database: anchore
+      host: postgresql
+      port: 5432
+    flux:
+      timeout: 15m
+      install:
+        remediation:
+          retries: 0
+          remediateLastFailure: false
+      upgrade:
+        timeout: 20m
+        remediation:
+          retries: 0
+          remediateLastFailure: false
+        cleanupOnFail: false
     sso:
       enabled: false
       client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_anchore
@@ -1242,21 +1260,6 @@ addons:
         resources:
           requests:
             memory: 200Mi
-      postgresql:
-        persistence:
-          size: 256Mi
-        resources:
-          requests:
-            memory: 1024Mi
-        metrics:
-          resources:
-            requests:
-              memory: 200Mi
-      ensureDbJobs:
-        resources:
-          requests:
-            cpu: 100m
-            memory: 200Mi
       ui-redis:
         upstream:
           replica:
@@ -1264,10 +1267,14 @@ addons:
             autoscaling:
               enabled: false
       upstream:
+        anchoreConfig:
+          default_admin_password: anchore-admin,123
+          keys:
+            secret: anchore-saml-secret-ci
         dataSyncer:
           initContainers:
             - name: wait-for-catalog
-              image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:5.27.1
+              image: registry1.dso.mil/ironbank/anchore/enterprise/enterprise:6.1.1
               command:
                 - /bin/sh
                 - -c

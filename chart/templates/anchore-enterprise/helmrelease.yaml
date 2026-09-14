@@ -26,13 +26,17 @@ spec:
 
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "anchore-enterprise" "root" .) | nindent 2 }}
 
-  {{- if or $istioEnabled .Values.monitoring.enabled }}
+  {{- if or $istioEnabled .Values.monitoring.enabled (and .Values.addons.keycloak.enabled .Values.addons.anchoreEnterprise.sso.enabled) }}
   dependsOn:
     {{- if $istioEnabled }}
     {{- include "istioHelmReleases" . | nindent 4 }}
     {{- end }}
     {{- if .Values.monitoring.enabled }}
     - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if and .Values.addons.keycloak.enabled .Values.addons.anchoreEnterprise.sso.enabled }}
+    - name: keycloak
       namespace: {{ .Release.Namespace }}
     {{- end }}
   {{- end }}
