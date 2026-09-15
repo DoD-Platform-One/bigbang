@@ -1270,7 +1270,13 @@ networkPolicies:
 {{- define "bigbang.cypressKeycloakValues" }}
 {{- $pkg := .package -}}
 {{- $values := .values -}}
-cypress_keycloak_test_enable: {{ and $values.addons.keycloak.enabled $pkg.sso.enabled | quote }}
+{{- $enabled := dig "sso" "enabled" false $pkg -}}
+{{- /* These packages expose SSO testing without an application-level SSO switch. */ -}}
+{{- if (.testOnly | default false) -}}
+  {{- $requested := dig "values" "bbtests" "cypress" "envs" "cypress_sso_test_requested" false $pkg -}}
+  {{- $enabled = eq (toString $requested) "true" -}}
+{{- end -}}
+cypress_keycloak_test_enable: {{ and $values.addons.keycloak.enabled $enabled | quote }}
 cypress_keycloak_url: {{ printf "https://keycloak.%s/" $values.domain | quote }}
 cypress_tnr_username: {{ dig "bbtests" "cypress" "envs" "cypress_tnr_username" "cypress" $values.addons.keycloak.values | quote }}
 cypress_tnr_password: {{ dig "bbtests" "cypress" "envs" "cypress_tnr_password" "tnr_w!G33ZyAt@C8" $values.addons.keycloak.values | quote }}

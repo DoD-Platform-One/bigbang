@@ -116,6 +116,7 @@ bbtests:
   cypress:
     envs:
       cypress_vault_url: {{ printf "https://vault.%s" $domainName | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.vault "values" .Values "testOnly" true) | nindent 6 }}
 
 upstream:
   global:

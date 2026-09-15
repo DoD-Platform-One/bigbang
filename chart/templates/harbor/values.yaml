@@ -62,6 +62,7 @@ bbtests:
   cypress:
     envs:
       cypress_url: {{ printf "https://harbor.%s" .Values.domain | quote }}
+      {{- include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.harbor "values" .Values "testOnly" true) | nindent 6 }}
   scripts:
     envs:
       HARBOR_REGISTRY: {{ printf "harbor.%s" .Values.domain | quote }}
