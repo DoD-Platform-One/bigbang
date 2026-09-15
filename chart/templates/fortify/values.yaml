@@ -84,5 +84,11 @@ bbtests:
   cypress:
     envs:
       cypress_url: {{ printf "https://fortify.%s" $domainName | quote }}
+      {{- $ssoTestValues := include "bigbang.cypressKeycloakValues" (dict "package" .Values.addons.fortify "values" .Values "testOnly" true) | fromYaml }}
+      {{- toYaml $ssoTestValues | nindent 6 }}
+      # Fortify's SAML test uses these names for the shared Keycloak settings.
+      cypress_sso_test_enable: {{ $ssoTestValues.cypress_keycloak_test_enable | quote }}
+      cypress_sso_username: {{ $ssoTestValues.cypress_tnr_username | quote }}
+      cypress_sso_password: {{ $ssoTestValues.cypress_tnr_password | quote }}
 
 {{- end }}
