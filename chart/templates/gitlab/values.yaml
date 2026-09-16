@@ -47,6 +47,8 @@ domain: {{ $domainName }}
     {{- $gitlabPsqlValues = $configuredPsqlValues }}
   {{- end }}
 {{- end }}
+{{- $externalRedisHost := get $gitlabRedisValues "host" }}
+{{- $externalRedisRouteEnabled := and $externalRedisConfigured (not (empty $externalRedisHost)) }}
 
 openshift: {{ .Values.openshift }}
 
@@ -128,6 +130,16 @@ routes:
       selector:
         app: gitlab-pages
   outbound:
+    external-redis:
+      enabled: {{ $externalRedisRouteEnabled }}
+      {{- if $externalRedisRouteEnabled }}
+      hosts:
+      - {{ $externalRedisHost | quote }}
+      ports:
+      - number: {{ default 6379 (get $gitlabRedisValues "port") }}
+        name: redis
+        protocol: TCP
+      {{- end }}
     bb-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.addons.gitlab.values }}
       hosts:
@@ -150,7 +162,7 @@ networkPolicies:
         from:
           k8s:
             alloy-alloy-metrics@alloy/alloy-metrics: {{ dig "alloyMetrics" "enabled" false .Values.alloy }}
-            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and .Values.monitoring.enabled (dig "redis" "install" true .Values.addons.gitlab.values) }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and (not $externalRedisConfigured) .Values.monitoring.enabled (dig "redis" "install" true .Values.addons.gitlab.values) }}
       gitlab-exporter:9168:
         podSelector:
           matchLabels:

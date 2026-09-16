@@ -98,7 +98,7 @@ addons:
         enabled: true
 ```
 
-Authservice can also be configured to communicate with external redis serivces such as Elasticache.
+Authservice can also be configured to communicate with external Redis services such as ElastiCache.
 
 ```yaml
 addons:
@@ -106,6 +106,28 @@ addons:
     values:
       global:
         redis_server_uri: "tcp://redis-01.7abc2d.0001.usw2.cache.amazonaws.com:6379"
+```
+
+Big Bang automatically creates one outbound route on port `6379`, preferring
+`global.redis_server_uri` and otherwise using the first chain-level
+`redis_server_uri`. If additional chains use different Redis hosts, add a
+[`routes.outbound`](https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/routes.md)
+entry for each additional host:
+
+```yaml
+addons:
+  authservice:
+    values:
+      routes:
+        outbound:
+          secondary-redis:
+            enabled: true
+            hosts:
+              - redis-02.example.internal
+            ports:
+              - number: 6379
+                name: redis
+                protocol: TCP
 ```
 
 ### High Availability

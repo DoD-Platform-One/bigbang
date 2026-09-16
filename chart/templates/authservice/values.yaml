@@ -21,6 +21,24 @@
 {{- $ambientEnabled := eq (include "ambientEnabled" .) "true" }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
+{{- $authserviceValues := .Values.addons.authservice.values | default dict }}
+{{- $internalRedisEnabled := dig "redis" "enabled" false $authserviceValues }}
+{{- $externalRedisUri := dig "global" "redis_server_uri" "" $authserviceValues }}
+{{- /* Generate one automatic route; additional chain-specific Redis hosts require explicit outbound routes. */ -}}
+{{- range $_, $chain := (.Values.addons.authservice.chains | default dict) }}
+{{- if and (empty $externalRedisUri) (kindIs "map" $chain) }}
+{{- $externalRedisUri = get $chain "redis_server_uri" | default "" }}
+{{- end }}
+{{- end }}
+{{- range $_, $chain := (dig "chains" dict $authserviceValues) }}
+{{- if and (empty $externalRedisUri) (kindIs "map" $chain) }}
+{{- $externalRedisUri = get $chain "redis_server_uri" | default "" }}
+{{- end }}
+{{- end }}
+{{- $externalRedisEnabled := not (empty $externalRedisUri) }}
+{{- $externalRedisAddress := regexReplaceAll "^[a-zA-Z][a-zA-Z0-9+.-]*://" $externalRedisUri "" }}
+{{- $externalRedisAddress = regexReplaceAll "^.*@" $externalRedisAddress "" }}
+{{- $externalRedisHost := trimSuffix ":6379" $externalRedisAddress }}
 {{- $istioHardenedEnabled := or
     (dig "istio" "hardened" "enabled" false .Values.monitoring.values)
     (dig "istio" "hardened" "enabled" false .Values.addons.authservice.values)
@@ -39,6 +57,16 @@ istio:
 
 routes:
   outbound:
+    external-redis:
+      enabled: {{ $externalRedisEnabled }}
+      {{- if $externalRedisEnabled }}
+      hosts:
+      - {{ $externalRedisHost | quote }}
+      ports:
+      - number: 6379
+        name: redis
+        protocol: TCP
+      {{- end }}
     bb-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.addons.authservice.values }}
       hosts:
@@ -93,7 +121,7 @@ networkPolicies:
       redis-bb:6379:
         from:
           k8s:
-            monitoring/grafana: {{ .Values.monitoring.enabled }}
+            monitoring/grafana: {{ and $internalRedisEnabled .Values.monitoring.enabled }}
       haproxy:8080:
         from:
           k8s:
@@ -102,7 +130,7 @@ networkPolicies:
       redis-bb:9121:
         from:
           k8s:
-            monitoring/prometheus: {{ .Values.monitoring.enabled }}
+            monitoring/prometheus: {{ and $internalRedisEnabled .Values.monitoring.enabled }}
       # HBONE ingress from istio-gateway to the authservice waypoint (ambient)
       authservice-waypoint:15008:
         podSelector:
@@ -118,6 +146,7 @@ networkPolicies:
         to:
           definition:
             sso: true
+            redis-subnets: {{ $externalRedisEnabled }}
           k8s:
             # Tempo trace data
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
@@ -127,14 +156,14 @@ networkPolicies:
             monitoring/alertmanager:9093: {{ ((.Values.packages).haproxy).enabled }}
             monitoring/prometheus:9090: {{ ((.Values.packages).haproxy).enabled }}
 
-{{- if or (dig "redis" "enabled" false .Values.addons.authservice.values) (dig "global" "redis_server_uri" "" .Values.addons.authservice.values) }}
+{{- if or $internalRedisEnabled $externalRedisEnabled }}
 autoscaling:
   enabled: true
   minReplicas: 2
   maxReplicas: 3
 {{- end }}
 
-{{- if and (dig "redis" "enabled" false .Values.addons.authservice.values) (or .Values.monitoring.enabled .Values.kiali.enabled) }}
+{{- if and $internalRedisEnabled (or .Values.monitoring.enabled .Values.kiali.enabled) }}
 redis-bb:
   upstream:
     global:
@@ -199,7 +228,6 @@ global:
   logout_redirect_uri: {{ include "sso.oidc.endsession" . }}
   {{- end }}
 
-  {{- $authserviceValues := .Values.addons.authservice.values | default dict }}
   {{- $redisValues := $authserviceValues.redis | default dict }}
   {{- if hasKey $redisValues "enabled" }}
   {{- if $redisValues.enabled }}

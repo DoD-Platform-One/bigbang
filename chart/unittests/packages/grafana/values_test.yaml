@@ -124,3 +124,34 @@ tests:
       - equal:
           path: upstream.datasources["datasourcesbb.yaml"].datasources[1].url
           value: redis-master.redis.svc.cluster.local:6379
+      - equal:
+          path: routes.outbound["external-gitlab-redis"].enabled
+          value: true
+      - equal:
+          path: routes.outbound["external-gitlab-redis"].hosts[0]
+          value: redis-master.redis.svc.cluster.local
+      - equal:
+          path: networkPolicies.egress.from.grafana.to.definition.redis-subnets
+          value: true
+
+  - it: should not access Argo CD external Redis
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.argocd.enabled: true
+      addons.argocd.redis.host: redis.argocd.example.internal
+    asserts:
+      - notExists:
+          path: routes.outbound["external-argocd-redis"]
+      - notEqual:
+          path: upstream.datasources["datasourcesbb.yaml"].datasources[0].name
+          value: Argo External
+      - notEqual:
+          path: upstream.datasources["datasourcesbb.yaml"].datasources[0].url
+          value: redis.argocd.example.internal:6379
+      - notEqual:
+          path: networkPolicies.egress.from.grafana.to.definition.redis-subnets
+          value: true

@@ -77,6 +77,16 @@ routes:
       service: anchore-enterprise-anchore-enterprise-ui.anchore.svc.cluster.local
       port: 3000
   outbound:
+    external-redis:
+      enabled: {{ $externalRedisEnabled }}
+      {{- if $externalRedisEnabled }}
+      hosts:
+      - {{ .Values.addons.anchoreEnterprise.redis.host | quote }}
+      ports:
+      - number: {{ .Values.addons.anchoreEnterprise.redis.port }}
+        name: redis
+        protocol: TCP
+      {{- end }}
     anchore-data-service:
       enabled: true
       hosts:

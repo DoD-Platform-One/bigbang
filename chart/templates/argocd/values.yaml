@@ -15,6 +15,8 @@
 
 {{- define "bigbang.defaults.argocd" -}}
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
+{{- $externalRedisEnabled := not (empty .Values.addons.argocd.redis.host) }}
+{{- $externalRedisPort := default 6379 .Values.addons.argocd.redis.port }}
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
 {{- $domainName := default .Values.domain .Values.hostname }}
 hostname: {{ $domainName }}
@@ -23,7 +25,7 @@ domain: {{ $domainName }}
 redis-bb:
   networkPolicy:
     enabled: {{ .Values.networkPolicies.enabled }}
-  {{- if and .Values.addons.argocd.redis.host .Values.addons.argocd.redis.port }}
+  {{- if $externalRedisEnabled }}
   enabled: false
   {{- else }}
   enabled: true
@@ -112,6 +114,16 @@ routes:
       enabled: {{ dig "bbtests" "enabled" false .Values.addons.argocd.values }}
       hosts:
       - 'repo1.dso.mil'
+    external-redis:
+      enabled: {{ $externalRedisEnabled }}
+      {{- if $externalRedisEnabled }}
+      hosts:
+      - {{ .Values.addons.argocd.redis.host | quote }}
+      ports:
+      - number: {{ $externalRedisPort }}
+        name: redis
+        protocol: TCP
+      {{- end }}
 
 networkPolicies:
   ingress:
@@ -135,17 +147,19 @@ networkPolicies:
       redis-bb:6379:
         from:
           k8s:
-            monitoring/grafana: {{ and (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.grafana.enabled }}
+            monitoring/grafana: {{ and (not $externalRedisEnabled) (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.grafana.enabled }}
       # -- Ingress to redis-exporter for metrics from prometheus
       redis-bb:9121:
         from:
           k8s:
-            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.monitoring.enabled }}
+            monitoring-monitoring-kube-prometheus@monitoring/prometheus: {{ and (not $externalRedisEnabled) (dig "redis-bb" "enabled" true .Values.addons.argocd.values) .Values.monitoring.enabled }}
   egress:
     from:
       # -- Egress to tempo for tracing from all pods
       "*":
         to:
+          definition:
+            redis-subnets: {{ $externalRedisEnabled }}
           k8s:
             tempo/tempo:9411: {{ and .Values.tempo.enabled (ne (include "ambientEnabled" .) "true") }}
 
@@ -254,4 +268,3 @@ upstream:
     {{- end }}
 
 {{- end -}}
-

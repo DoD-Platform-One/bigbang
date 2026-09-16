@@ -22,8 +22,11 @@ hostname: {{ $domainName }}
 domain: {{ $domainName }}
 
 {{- $gitlabRedis := (and (ne .Values.addons.gitlab.redis.password "" ) (or .Values.addons.gitlab.enabled .Values.addons.gitlabRunner.enabled)) }}
-{{- $gitlabRedisHost := dig "global" "redis" "host" "gitlab-redis-master.gitlab.svc.cluster.local" .Values.addons.gitlab.values }}
+{{- $gitlabExternalRedisHost := dig "global" "redis" "host" "" .Values.addons.gitlab.values }}
+{{- $gitlabRedisHost := default "gitlab-redis-master.gitlab.svc.cluster.local" $gitlabExternalRedisHost }}
 {{- $gitlabRedisPort := dig "global" "redis" "port" 6379 .Values.addons.gitlab.values }}
+{{- $gitlabExternalRedisEnabled := and $gitlabRedis (not (empty $gitlabExternalRedisHost)) }}
+{{- $argocdExternalRedisEnabled := and .Values.addons.argocd.enabled (not (empty .Values.addons.argocd.redis.host)) }}
 {{- $authserviceRedisEnabled := (and (dig "values" "redis" "enabled" false .Values.addons.authservice) .Values.addons.authservice.enabled) }}
 {{- $enterpriseEnabled := (dig "enterprise" "enabled" false .Values.grafana) }}
 
@@ -61,11 +64,23 @@ networkPolicies:
             thanos/thanos:9090: {{ .Values.addons.thanos.enabled }}
       grafana:
         to:
+          definition:
+            redis-subnets: {{ $gitlabExternalRedisEnabled }}
           k8s:
             authservice/authservice:10003: {{ $authserviceRedisEnabled }}
 
 routes:
   outbound:
+    external-gitlab-redis:
+      enabled: {{ $gitlabExternalRedisEnabled }}
+      {{- if $gitlabExternalRedisEnabled }}
+      hosts:
+      - {{ $gitlabExternalRedisHost | quote }}
+      ports:
+      - number: {{ $gitlabRedisPort }}
+        name: redis
+        protocol: TCP
+      {{- end }}
     grafana-bb-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.grafana.values }}
       hosts:
@@ -156,7 +171,7 @@ upstream:
         editable: true
       {{- end }}
       {{- end }}
-      {{- if .Values.addons.argocd.enabled }}
+      {{- if and .Values.addons.argocd.enabled (not $argocdExternalRedisEnabled) }}
       - name: Argo Master
         type: redis-datasource
         access: proxy
