@@ -86,7 +86,7 @@ For upstream passthrough configuration, document only the parent entry point and
 
 - Defaults, fixtures, rendered output, logs, and commits must not contain real credentials, private keys, license data, or production endpoints.
 - `scripts/template-all.sh` is networked, hard-resets its source cache, adds Helm repositories, and may authenticate to registries.
-- `scripts/install_flux.sh`, `scripts/sync.sh`, `scripts/remove-ns-finalizer.sh`, and restart modes in `scripts/istio-sidecars.sh` mutate the cluster selected by the active kubeconfig.
+- `scripts/install_flux.sh`, `scripts/remove-ns-finalizer.sh`, and restart modes in `scripts/istio-sidecars.sh` mutate the cluster selected by the active kubeconfig.
 - GitLab triage scripts can create or modify issues and provide dry-run modes.
 
 ## Generated Files

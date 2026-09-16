@@ -57,8 +57,7 @@ Configure `myvalues.yaml` to suit your needs.
 # NOTE: This is the alternative to deploying a HelmRelease and having flux manage it, we use a local copy to avoid having to commit every change
 helm upgrade -i bigbang chart -n bigbang --create-namespace -f myvalues.yaml
 
-# It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them.  This is based on the flux `interval` value set for polling.  You can force Big Bang to immediately check for changes by running the ./scripts/sync.sh script.
-./scripts/sync.sh
+# It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them.  This is based on the flux `interval` value set for polling.  
 ```
 
 For more extensive development, use the [Development Guide](./docs/community/development/).
