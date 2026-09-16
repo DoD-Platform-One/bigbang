@@ -101,16 +101,7 @@ For example, to run the Renovate job every day at 1:00 AM, set the schedule fiel
 
 ### Other Options
 
-The chart also exposes standard Kubernetes CronJob fields:
-
-| Option | What it does |
-| --- | --- |
-| `suspend` | If `true`, the job is suspended and will not run. |
-| `concurrencyPolicy` | `Allow`, `Forbid`, or `Replace` — how the job handles overlapping runs. |
-| `failedJobsHistoryLimit` / `successfulJobsHistoryLimit` | How many past job records to retain. |
-| `jobRestartPolicy` | `Never` or `OnFailure`. |
-| `jobBackoffLimit` | Maximum retries before the job is considered failed. |
-| `startingDeadlineSeconds` | How long to wait for the job to start before cancelling it. |
+ See the [Kubernetes CronJob documentation](https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/) and [Kubernetes Job documentation](https://kubernetes.io/docs/concepts/workloads/controllers/job/) for configuration details.
 
 Once you've configured the schedule in your values, deploy or update the Renovate chart with `helm install` or `helm upgrade` as usual.
 
@@ -249,20 +240,4 @@ Use [regex named groups](https://www.regular-expressions.info/refext.html) to ca
 
 #### Package Configuration Options
 
-Every option below appears in the example above.
-
-| Option | What it does |
-| --- | --- |
-| `dependencyDashboard` | When enabled, creates an issue that acts as a dashboard — an overview of the status of every tracked update. See [Renovate's dependencyDashboard reference](https://docs.renovatebot.com/configuration-options/#dependencydashboard) for the full set of dashboard options. |
-| `dependencyDashboardHeader` | Sets a header shown at the top of the dashboard issue. The example uses it to add a checklist item reminding whoever picks up the ticket to review Big Bang's release notes and changelog before merging. |
-| `dependencyDashboardTitle` | Sets the dashboard issue's title. The example sets it to "Renovate: Upgrade Big Bang," so the issue reads as a Big Bang upgrade rather than a generic dependency bump. |
-| `packageRules` | Groups matching packages together in the dashboard; the example groups everything using the `git-tags` datasource under one "Big Bang" entry. See [Renovate's packageRules reference](https://docs.renovatebot.com/configuration-options/#packagerules) for the full syntax. |
-| `baseBranches` | Which branch(es) Renovate compares against — the example uses `main`. |
-| `draftPR` | Whether Renovate opens its merge requests as drafts. The example sets this to `true`, which is why the diagram above shows a draft merge request rather than one ready for review. |
-| `enabledManagers` | Which Renovate managers are active — the example enables only `regex`, since Big Bang's own version isn't detectable through a standard package-manager file. |
-| `labels` | Labels applied to opened merge requests — the example applies `renovate`. |
-| `commitMessagePrefix` | Prefix added to commit messages — set to an empty string in the example. |
-| `separateMajorMinor` | Whether major and minor updates get separate merge requests — set to `false` in the example. |
-| `configWarningReuseIssue` | Whether Renovate reuses and reopens an existing closed Config Warning issue instead of creating a new one; set to false in the example. |
-
-`ignorePaths` and `ignoreDeps` aren't used in this example; see [Renovate's configuration reference](https://docs.renovatebot.com/configuration-options/) if you need to exclude specific files or dependencies.
+See [Renovate's configuration options](https://docs.renovatebot.com/configuration-options/) for details on available package configuration options.
