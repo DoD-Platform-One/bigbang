@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Argo CD - Values Tests
+templates:
+  - templates/argocd/values.yaml
+tests:
+  - it: should account for external Redis in routes and network policies
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.argocd.enabled: true
+      addons.argocd.redis.host: redis.example.internal
+    asserts:
+      - equal:
+          path: routes.outbound["external-redis"].enabled
+          value: true
+      - equal:
+          path: routes.outbound["external-redis"].hosts[0]
+          value: redis.example.internal
+      - equal:
+          path: routes.outbound["external-redis"].ports[0].number
+          value: 6379
+      - equal:
+          path: upstream.externalRedis.port
+          value: 6379
+      - equal:
+          path: networkPolicies.egress.from["*"].to.definition.redis-subnets
+          value: true
+      - equal:
+          path: networkPolicies.ingress.to["redis-bb:6379"].from.k8s["monitoring/grafana"]
+          value: false

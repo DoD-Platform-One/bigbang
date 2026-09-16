@@ -267,6 +267,30 @@ tests:
       - exists:
           path: networkPolicies.egress.definitions.redis-subnets
 
+  - it: should account for external Redis in routes and disable internal Redis metrics ingress
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.gitlab.enabled: true
+      addons.gitlab.values.global.redis.host: redis.example.internal
+      addons.gitlab.values.global.redis.port: 6380
+    asserts:
+      - equal:
+          path: routes.outbound["external-redis"].enabled
+          value: true
+      - equal:
+          path: routes.outbound["external-redis"].hosts[0]
+          value: redis.example.internal
+      - equal:
+          path: routes.outbound["external-redis"].ports[0].number
+          value: 6380
+      - equal:
+          path: networkPolicies.ingress.to["redis:9121"].from.k8s["monitoring-monitoring-kube-prometheus@monitoring/prometheus"]
+          value: false
+
   - it: tolerates null GitLab 19 removed service blocks without enabling replacements
     postRenderer:
       cmd: "sh"

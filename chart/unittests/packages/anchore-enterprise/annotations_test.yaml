@@ -60,3 +60,31 @@ tests:
       - equal:
           path: upstream.ui.annotations["bigbang.dev/istioDataplane"]
           value: ambient
+
+  - it: should account for external Redis in routes and network policies
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.anchoreEnterprise.enabled: true
+      addons.anchoreEnterprise.redis.host: redis.example.internal
+      addons.anchoreEnterprise.redis.port: 6380
+      addons.anchoreEnterprise.redis.password: test-password
+    asserts:
+      - equal:
+          path: routes.outbound["external-redis"].enabled
+          value: true
+      - equal:
+          path: routes.outbound["external-redis"].hosts[0]
+          value: redis.example.internal
+      - equal:
+          path: routes.outbound["external-redis"].ports[0].number
+          value: 6380
+      - equal:
+          path: networkPolicies.egress.from.api.to.definition.redis-subnets
+          value: true
+      - equal:
+          path: networkPolicies.egress.from.ui.to.definition.redis-subnets
+          value: true

@@ -19,6 +19,12 @@
 
 {{- define "bigbang.defaults.harbor" -}}
 {{- $postgresEnabled := dig "postgresql" "enabled" true .Values.addons.harbor.values }}
+{{- $externalRedisAddr := dig "redis" "external" "addr" "" .Values.addons.harbor.values }}
+{{- $externalRedisEnabled := and (eq (dig "redis" "type" "external" .Values.addons.harbor.values) "external") (not (empty $externalRedisAddr)) }}
+{{- $externalRedisAddress := regexReplaceAll "^[a-zA-Z][a-zA-Z0-9+.-]*://" $externalRedisAddr "" }}
+{{- $externalRedisAddress = regexReplaceAll "^.*@" $externalRedisAddress "" }}
+{{- $externalRedisHost := regexReplaceAll ":\\d+(/.*)?$" $externalRedisAddress "" }}
+{{- $externalRedisPort := default "6379" (regexFind ":[0-9]+" $externalRedisAddress | trimPrefix ":") }}
 
 externalURL: https://harbor.{{ .Values.domain }}
 
@@ -30,6 +36,16 @@ routes:
       gateways:
         - {{ include "getGatewayName" (dict "gateway" .Values.addons.harbor.ingress.gateway "root" .)}}
   outbound:
+    external-redis:
+      enabled: {{ $externalRedisEnabled }}
+      {{- if $externalRedisEnabled }}
+      hosts:
+      - {{ $externalRedisHost | quote }}
+      ports:
+      - number: {{ $externalRedisPort }}
+        name: redis
+        protocol: TCP
+      {{- end }}
     bb-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.addons.harbor.values }}
       hosts:
@@ -48,6 +64,7 @@ networkPolicies:
         to:
           definition:
             database-subnets: {{ not $postgresEnabled }}
+            redis-subnets: {{ $externalRedisEnabled }}
           k8s:
             tempo/tempo:9411: {{ .Values.tempo.enabled }}
   ingress:

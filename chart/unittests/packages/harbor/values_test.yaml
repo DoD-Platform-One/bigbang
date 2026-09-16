@@ -41,3 +41,25 @@ tests:
       - equal:
           path: networkPolicies.egress.from.harbor.to.definition.database-subnets
           value: false
+  - it: should account for external Redis in routes and network policies
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      addons.harbor.enabled: true
+      addons.harbor.values.redis.external.addr: redis.example.internal:6380
+    asserts:
+      - equal:
+          path: routes.outbound["external-redis"].enabled
+          value: true
+      - equal:
+          path: routes.outbound["external-redis"].hosts[0]
+          value: redis.example.internal
+      - equal:
+          path: routes.outbound["external-redis"].ports[0].number
+          value: 6380
+      - equal:
+          path: networkPolicies.egress.from.harbor.to.definition.redis-subnets
+          value: true

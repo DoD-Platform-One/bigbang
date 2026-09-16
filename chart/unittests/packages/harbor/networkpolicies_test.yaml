@@ -25,3 +25,18 @@ tests:
       - equal:
           path: metadata.name
           value: allow-egress-from-harbor-to-database-subnets
+  - it: should create redis-subnets egress NetworkPolicy when external Redis is configured
+    set:
+      addons.harbor.enabled: true
+      addons.harbor.values.redis.external.addr: redis.example.internal:6380
+      networkPolicies.enabled: true
+    documentSelector:
+      path: metadata.name
+      value: allow-egress-from-harbor-to-redis-subnets
+    asserts:
+      - equal:
+          path: kind
+          value: NetworkPolicy
+      - equal:
+          path: metadata.name
+          value: allow-egress-from-harbor-to-redis-subnets
