@@ -40,7 +40,7 @@ Big Bang follows a [GitOps](https://fluxcd.io/flux/concepts/#gitops) approach to
 
 All changes to the Big Bang cluster should be made through Git. After changes are pushed, Big Bang will automatically reconcile the difference with the cluster.
 
-> It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them. This is based on the `interval` value set for polling. You can force Big Bang to immediately check for changes by running the [sync.sh](../../scripts/sync.sh) script.
+> It may take Big Bang up to 10 minutes to recognize your changes and start to deploy them. This is based on the `interval` value set for polling. 
 
 Changes to values can be tested in each environment using the named folders to override values and/or point to specific repo branches or tags. After testing, the changes can be placed into the `./base` folder if the change is shared between all environments.
 
