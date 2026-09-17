@@ -888,6 +888,18 @@ monitoring:
             cpu: 100m
             memory: 30Mi
           limits: {}
+      kubeControllerManager:
+        serviceMonitor:
+          enabled: false
+      kubeScheduler:
+        serviceMonitor:
+          enabled: false
+      kubeEtcd:
+        serviceMonitor:
+          enabled: false
+      kubeProxy:
+        serviceMonitor:
+          enabled: false
     bbtests:
       enabled: true
 
