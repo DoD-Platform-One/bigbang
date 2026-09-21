@@ -144,58 +144,6 @@ upstream:
         record["kubernetes"]["labels"]["cluster"] = "{{ $clusterName }}"
         return 1, timestamp, record
       end
-    remove_labels.lua: |
-      function remove_labels(tag, timestamp, record)
-
-        local patterns = {
-          "service.istio.-",
-          "security.istio.-",
-          "helm.-",
-          "istio.-",
-          "statefulset.kubernetes.io/pod%-name",
-          "prometheus",
-          "operator.prometheus.io/name",
-          "app.kubernetes.io/managed%-by",
-          "app.kubernetes.io/part%-of",
-          "apps.kuberentes.io/version",
-          "apps.kubernetes.io/pod%-index",
-          "heritage",
-          "release",
-          "elasticsearch.k8s.elastic.co.node.-",
-          "vault_active",
-          "vault_initialized",
-          "vault_perf_standby"
-        }
-
-        if record["kubernetes"] ~= nil then
-          if record["kubernetes"]["labels"] ~= nil then
-
-            for key, value in pairs(record["kubernetes"]["labels"]) do
-              -- Uncomment for debugging
-              -- print("Checking - Label " .. key .. "=" .. value)
-
-              local remove_key = false
-              local i = 1
-              while not remove_key and i <= #patterns do
-                if string.match(key, patterns[i]) then
-                  remove_key = true
-                end
-                i = i + 1
-              end
-
-              -- Key matched a pattern, remove it
-              if remove_key then
-                -- Uncomment for debugging
-                -- print("Removing - Label " .. key .. "=" .. value)
-                record["kubernetes"]["labels"][key] = nil
-              end
-            end
-
-          end
-        end
-
-        return 1, timestamp, record
-      end
 
 {{- if (not $disableDefault) }}
   {{- $additionalElasticsearch := (and
@@ -389,10 +337,10 @@ upstream:
       [OUTPUT]
           name                   loki
           match                  kube.*
-          labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
+          labels                 job=fluentbit, cluster={{ $clusterName }}, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host'], app_kubernetes_io_name=$kubernetes['labels']['app.kubernetes.io/name']
           host                   {{ $lokiWriteDestUrl }}
           port                   3100
-          auto_kubernetes_labels on
+          auto_kubernetes_labels off
           Retry_Limit            False
           tls                    Off
           net.keepalive          Off
@@ -400,10 +348,10 @@ upstream:
       [OUTPUT]
           name                   loki
           match                  host.*
-          labels                 job=fluentbit, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host']
+          labels                 job=fluentbit, cluster={{ $clusterName }}, container=$kubernetes['container_name'], pod=$kubernetes['pod_name'], namespace=$kubernetes['namespace_name'], node_name=$kubernetes['host'], app_kubernetes_io_name=$kubernetes['labels']['app.kubernetes.io/name']
           host                   {{ $lokiWriteDestUrl }}
           port                   3100
-          auto_kubernetes_labels on
+          auto_kubernetes_labels off
           Retry_Limit            False
           tls                    Off
           net.keepalive          Off
@@ -537,13 +485,6 @@ upstream:
           Match         kube.*
           script        /fluent-bit/scripts/add_labels.lua
           call          add_labels
-      {{- if .Values.loki.enabled }}
-      [FILTER]
-          Name          lua
-          Match         kube.*
-          script        /fluent-bit/scripts/remove_labels.lua
-          call          remove_labels
-      {{- end }}
   {{- end }}
 
 loki:
