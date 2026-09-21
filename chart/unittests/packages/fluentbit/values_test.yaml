@@ -31,6 +31,26 @@ tests:
           path: networkPolicies.egress.from.fluent-bit.to.definition.external-elastic.enabled
           value: true
 
+  - it: should use label allowlist with auto_kubernetes_labels off when loki is enabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval '.stringData.defaults' - | yq eval '.'"
+    set:
+      fluentbit.enabled: true
+      loki.enabled: true
+    asserts:
+      - matchRegex:
+          path: upstream.config.outputs
+          pattern: "auto_kubernetes_labels off"
+      - matchRegex:
+          path: upstream.config.outputs
+          pattern: "cluster="
+      - notMatchRegex:
+          path: upstream.config.outputs
+          pattern: "auto_kubernetes_labels on"
+
   - it: should merge external fluentd definition and enable egress rule
     postRenderer:
       cmd: "sh"
