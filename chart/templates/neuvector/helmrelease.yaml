@@ -25,7 +25,7 @@ spec:
   {{- end }}
   {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "neuvector" "root" .) | nindent 2 }}
 
-  {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled }}
+  {{- if or .Values.gatekeeper.enabled $istioEnabled .Values.kyvernoPolicies.enabled .Values.monitoring.enabled (and .Values.addons.keycloak.enabled .Values.neuvector.sso.enabled) }}
   dependsOn:
     {{- if .Values.gatekeeper.enabled }}
     - name: gatekeeper
@@ -40,6 +40,10 @@ spec:
     {{- end }}
     {{- if .Values.monitoring.enabled }}
     - name: monitoring
+      namespace: {{ .Release.Namespace }}
+    {{- end }}
+    {{- if and .Values.addons.keycloak.enabled .Values.neuvector.sso.enabled }}
+    - name: keycloak
       namespace: {{ .Release.Namespace }}
     {{- end }}
   {{- end }}
