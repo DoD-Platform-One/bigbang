@@ -9,6 +9,12 @@ istio:
     # This automatically enables istioCNI, ztunnel, and gatewayAPI packages.
     # NOTE: Ambient mode is generally available as of Big Bang 3.32. It remains opt-in in 3.x and becomes the default in 4.0.
     enabled: false
+  # -- Egress gateway configuration
+  egressGateway:
+    # -- Enable the shared egress waypoint gateway (requires ambient mode).
+    # This automatically enables the istioEgressGateway package.
+    # NOTE: The egress gateway is an alpha feature.
+    enabled: false
 
 # -- Prevent Big Bang from creating GitRepository resources. HelmReleases configured with Git sources
 # will continue to reference those resources, so they must already exist in the expected namespaces.
@@ -262,6 +268,16 @@ networkPolicies:
           - ipBlock:
               cidr: 10.0.0.0/8
 
+# bb-common route defaults passed through to every package; per-route values always win.
+# See https://repo1.dso.mil/big-bang/product/packages/bb-common/-/blob/main/docs/README.md
+routes:
+  defaults:
+    outbound:
+      # -- Default egress waypoint binding ('<namespace>/<name>') for package outbound routes.
+      # Automatically set to false when ambient mode or the istioEgressGateway package is disabled.
+      # NOTE: The egress gateway is an alpha feature.
+      egressGateway: istio-egress/egress-waypoint
+
 # -- Global ImagePullPolicy value for all packages
 # Permitted values are: Never, Always, IfNotPresent
 imagePullPolicy: IfNotPresent
@@ -513,6 +529,26 @@ istioGateway:
   #           - op: add
   #             path: /metadata/annotations/bigbang.dev~1example
   #             value: example
+
+istioEgressGateway:
+  # -- Toggle deployment of the shared egress waypoint gateway (requires ambient mode)
+  enabled: false
+  # -- Choose source type of "git" or "helmRepo"
+  sourceType: "git"
+  git:
+    repo: https://repo1.dso.mil/big-bang/product/packages/istio-egress-gateway.git
+    path: "./chart"
+    tag: 0.1.3
+  helmRepo:
+    repoName: "registry1"
+    chartName: "istio-egress-gateway"
+    tag: 0.1.3
+  # -- Values to passthrough to the istio-egress-gateway chart
+  values: {}
+  # -- Flux reconciliation overrides specifically for the Istio Egress Gateway Package
+  flux: {}
+  # -- Post Renderers.  See docs/postrenders.md
+  postRenderers: []
 
 ztunnel:
   # -- Toggle deployment of ztunnel (required for Istio ambient mode)

@@ -1,0 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
+{{- if and (eq (include "egressGatewayEnabled" .) "true") (eq (include "ambientEnabled" .) "true") }}
+{{- include "bigbang.namespace" (dict "root" . "name" "istio-egress" "appName" "istio-egress-gateway" "component" "core" "package" .Values.istioEgressGateway) }}
+{{- end }}

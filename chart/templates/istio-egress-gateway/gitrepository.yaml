@@ -1,0 +1,4 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
+{{- if and (eq (include "egressGatewayEnabled" .) "true") (eq (include "ambientEnabled" .) "true") (eq .Values.istioEgressGateway.sourceType "git") (not .Values.offline) }}
+{{- include "bigbang.gitRepository" (dict "name" "istio-egress-gateway" "gitCredsName" "istioEgressGateway" "git" .Values.istioEgressGateway.git "component" "core" "root" .) }}
+{{- end }}

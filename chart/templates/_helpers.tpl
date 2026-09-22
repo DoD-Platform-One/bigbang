@@ -1031,6 +1031,11 @@ valuesFrom:
 {{ or .Values.ztunnel.enabled .Values.istio.ambient.enabled }}
 {{- end -}}
 
+{{- /* Returns true if the shared egress gateway is enabled (via istioEgressGateway package or global egressGateway flag) */ -}}
+{{- define "egressGatewayEnabled" -}}
+{{ or .Values.istioEgressGateway.enabled .Values.istio.egressGateway.enabled }}
+{{- end -}}
+
 {{- /*
 Returns "true" when Monitoring's prometheus/alertmanager should be protected by
 authservice via the monitoring package's own ambient waypoint (the bb-common
@@ -1130,6 +1135,25 @@ networkPolicies:
     definitions: {{ $root.Values.networkPolicies.ingress.definitions | toYaml | nindent 6 }}
   egress:
     definitions: {{ $root.Values.networkPolicies.egress.definitions | toYaml | nindent 6 }}
+{{- end -}}
+
+{{- /* Top-level routes.defaults passthrough, nested under a package's routes block.
+       Included per-package (only packages on a bb-common release with routes.defaults
+       support) until every bb-common package supports it; then fold this into
+       bigbang.commonPackageDefaults.
+       outbound.egressGateway is blanked unless ambient and the egress gateway package
+       are both enabled, so ServiceEntries are never bound to a waypoint that will not
+       exist (Istio fails open and traffic would egress directly). */ -}}
+{{- define "bigbang.routeDefaults" -}}
+{{- $routeDefaults := dig "defaults" dict (.Values.routes | default dict) }}
+{{- $egressGatewayActive := and (eq (include "ambientEnabled" .) "true") (eq (include "egressGatewayEnabled" .) "true") }}
+defaults:
+  {{- with dig "inbound" "gateways" list $routeDefaults }}
+  inbound:
+    gateways: {{ . | toYaml | nindent 6 }}
+  {{- end }}
+  outbound:
+    egressGateway: {{ ternary (dig "outbound" "egressGateway" false $routeDefaults) false $egressGatewayActive }}
 {{- end -}}
 
 {{- /*

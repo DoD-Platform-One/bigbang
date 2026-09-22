@@ -1,6 +1,7 @@
 nav:
   - Overview: index.md
   - Ambient Mode: ambient.md
+  - Ambient Egress Gateway: ambient-egress-gateway.md
   - Values Reference (generated): base-config.md
   - Default Credentials: default-credentials.md
   - Gateways: gateways.md

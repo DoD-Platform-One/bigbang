@@ -1,0 +1,41 @@
+{{- include "bigbang.normalizePackageAliases" . -}}
+{{- $fluxSettingsIstioEgressGateway := mergeOverwrite (deepCopy .Values.flux) .Values.istioEgressGateway.flux -}}
+{{- if and (eq (include "egressGatewayEnabled" .) "true") (eq (include "ambientEnabled" .) "true") }}
+{{- if not .Values.istiod.enabled }}
+{{- fail "istioEgressGateway requires istiod to be enabled" }}
+{{- end }}
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-egress-gateway
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: istio-egress-gateway
+    app.kubernetes.io/component: "core"
+    {{- include "commonLabels" . | nindent 4}}
+  annotations:
+    checksum/bigbang-values: {{ include (print $.Template.BasePath "/istio-egress-gateway/values.yaml") . | sha256sum }}
+spec:
+  releaseName: istio-egress-gateway
+  targetNamespace: istio-egress
+  {{- include "bigbang.helmRelease.chartSpec" (dict "name" "istio-egress-gateway" "package" .Values.istioEgressGateway "root" .) | nindent 2 }}
+
+  {{- toYaml $fluxSettingsIstioEgressGateway | nindent 2 }}
+
+  {{- if .Values.istioEgressGateway.postRenderers }}
+  postRenderers:
+  {{ toYaml .Values.istioEgressGateway.postRenderers | nindent 4 }}
+  {{- end }}
+  {{- include "bigbang.helmRelease.valuesFrom" (dict "name" "istio-egress-gateway" "root" .) | nindent 2 }}
+
+  dependsOn:
+    {{- include "istioHelmReleases" . | nindent 4 }}
+  {{- if .Values.gatekeeper.enabled }}
+    - name: gatekeeper
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+  {{- if .Values.kyvernoPolicies.enabled }}
+    - name: kyverno-policies
+      namespace: {{ .Release.Namespace }}
+  {{- end }}
+{{- end }}
