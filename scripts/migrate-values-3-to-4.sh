@@ -19,6 +19,7 @@ ROOT_PACKAGES=(
   istioCNI
   istioCRDs
   istiod
+  istioEgressGateway
   istioGateway
   kiali
   kyverno
@@ -69,6 +70,7 @@ BUILTIN_PACKAGE_METADATA=(
   "istioCNI|istio-cni"
   "istioCRDs|istio-crds"
   "istiod|istiod"
+  "istioEgressGateway|istio-egress-gateway"
   "istioGateway|istio-gateway"
   "kiali|kiali"
   "kyverno|kyverno"
