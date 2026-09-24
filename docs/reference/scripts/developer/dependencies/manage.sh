@@ -9,7 +9,7 @@ VALKEY_IMAGE="registry1.dso.mil/ironbank/afdco/valkey/valkey:9.0.4"
 PASSWORD="ci-only-password"
 GARAGE_ACCESS_KEY="GKbb0000000000000000000000"
 GARAGE_SECRET_KEY="bb00000000000000000000000000000000000000000000000000000000000000"
-DEFAULT_GARAGE_BUCKETS="ci-gitlab-lfs,ci-gitlab-artifacts,ci-gitlab-uploads,ci-gitlab-packages,ci-gitlab-mr-diffs,ci-gitlab-terraform-state,ci-gitlab-dependency-proxy,ci-gitlab-pseudo,ci-gitlab-backup,ci-gitlab-backup-tmp,ci-gitlab-registry,gitlab-uploads,mattermost"
+DEFAULT_GARAGE_BUCKETS="ci-gitlab-lfs,ci-gitlab-artifacts,ci-gitlab-uploads,ci-gitlab-packages,ci-gitlab-mr-diffs,ci-gitlab-terraform-state,ci-gitlab-dependency-proxy,ci-gitlab-pseudo,ci-gitlab-backup,ci-gitlab-backup-tmp,ci-gitlab-registry,gitlab-uploads,mattermost,mimir,thanos,loki,vault"
 NETWORK="k3d-dependencies"
 PREFIX="bigbang-dev"
 
