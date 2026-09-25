@@ -1257,11 +1257,11 @@ grafana:
   git:
     repo: https://repo1.dso.mil/big-bang/product/packages/grafana.git
     path: "./chart"
-    tag: "12.10.0-bb.1"
+    tag: "13.2.4-bb.0"
   helmRepo:
     repoName: "registry1"
     chartName: "grafana"
-    tag: "12.10.0-bb.1"
+    tag: "13.2.4-bb.0"
 
   # -- Flux reconciliation overrides specifically for the Grafana Package
   flux: {}
