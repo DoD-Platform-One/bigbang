@@ -102,6 +102,22 @@ upstream:
       callbackUrl: {{ printf "https://policyreporter.%s/callback" $domainName | quote }}
       clientId: {{ .Values.kyvernoReporter.sso.client_id }}
       clientSecret: {{ .Values.kyvernoReporter.sso.client_secret }}
+      {{- if and .Values.kyvernoReporter.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+      certificate: /etc/oidc/ca.pem
+      {{- end }}
+
+    {{- if and .Values.kyvernoReporter.sso.enabled (or .Values.sso.certificate_authority (dig "certificateAuthority" "cert" false .Values.sso)) }}
+    extraVolumes:
+      volumeMounts:
+        - name: tls-ca-sso
+          mountPath: /etc/oidc/ca.pem
+          subPath: ca.pem
+          readOnly: true
+      volumes:
+        - name: tls-ca-sso
+          secret:
+            secretName: {{ default (dig "certificateAuthority" "secretName" "" .Values.sso) .Values.sso.secretName }}
+    {{- end }}
 
   plugin:
     kyverno:
