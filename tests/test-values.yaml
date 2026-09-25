@@ -955,6 +955,13 @@ twistlock:
     enabled: false
     client_id: dev_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_twistlock-saml
   values:
+    resources:
+      requests:
+        cpu: 250m
+        memory: 2Gi
+      limits:
+        cpu: "1"
+        memory: 16Gi
     console:
       persistence:
         size: 5Gi
