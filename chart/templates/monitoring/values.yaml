@@ -654,14 +654,8 @@ upstream:
         - targetLabel: "instance"
           sourceLabels:
             - "__meta_kubernetes_pod_node_name"
-      {{- if $monitoringMtlsStrict }}
-      scheme: https
-      tlsConfig:
-        caFile: /etc/prom-certs/root-cert.pem
-        certFile: /etc/prom-certs/cert-chain.pem
-        keyFile: /etc/prom-certs/key.pem
-        insecureSkipVerify: true  # Prometheus does not support Istio security naming, thus skip verifying target pod certificate
-      {{- end }}
+      # Kubelet runs outside the mesh. Keep the upstream Kubernetes CA and
+      # service-account authorization instead of injecting Istio client certs.
   {{- end }}
   
   {{- if $lokiEnabled }}

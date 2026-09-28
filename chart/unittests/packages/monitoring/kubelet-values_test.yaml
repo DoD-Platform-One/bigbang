@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Monitoring - Kubelet TLS
+templates:
+  - templates/monitoring/values.yaml
+tests:
+  - it: keeps upstream kubelet TLS and authorization in sidecar strict mode
+    set:
+      loki.enabled: true
+      loki.clusterName: regression-cluster
+      monitoring.values.istio.mtls.mode: STRICT
+      istiod.enabled: true
+      prometheusOperatorCRDs.enabled: true
+    postRenderer: &defaults
+      cmd: sh
+      args: [-c, "yq '.stringData.defaults' | yq '.'"]
+    asserts:
+      - notExists:
+          path: upstream.kubelet.serviceMonitor.tlsConfig
+      - notExists:
+          path: upstream.kubelet.serviceMonitor.authorization
+      - equal:
+          path: upstream.kubelet.serviceMonitor.cAdvisorRelabelings[0].replacement
+          value: regression-cluster
+  - it: preserves kubelet defaults and cluster relabeling in ambient mode
+    set:
+      loki.enabled: true
+      loki.clusterName: regression-cluster
+      istio.ambient.enabled: true
+    postRenderer: *defaults
+    asserts:
+      - notExists:
+          path: upstream.kubelet.serviceMonitor.tlsConfig
+      - equal:
+          path: upstream.kubelet.serviceMonitor.cAdvisorRelabelings[0].replacement
+          value: regression-cluster
+  - it: does not inject kubelet configuration without Loki
+    set:
+      loki.enabled: false
+    postRenderer: *defaults
+    asserts:
+      - notExists:
+          path: upstream.kubelet
+  - it: preserves user kubelet TLS overrides separately from defaults
+    set:
+      monitoring.values.upstream.kubelet.serviceMonitor.tlsConfig.serverName: kubelet.example.test
+    postRenderer:
+      cmd: sh
+      args: [-c, "yq '.stringData.overlays' | yq '.'"]
+    asserts:
+      - equal:
+          path: upstream.kubelet.serviceMonitor.tlsConfig.serverName
+          value: kubelet.example.test
