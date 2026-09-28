@@ -27,6 +27,7 @@ K3D_DEV_POSTGRES_DATABASES="${K3D_DEV_POSTGRES_DATABASES:-gitlabhq_production,ma
 K3D_DEV_GARAGE_BUCKETS="${K3D_DEV_GARAGE_BUCKETS:-}"
 TMPDIR=$(mktemp -d)
 BASE_DOMAIN="dev.bigbang.mil"
+KEYCLOAK_TLS_TERMINATED=false
 PUBLIC_SUBDOMAINS=( # Subdomains that use the public gateway by default
   "alertmanager"
   "anchore-api"
@@ -55,7 +56,6 @@ PUBLIC_SUBDOMAINS=( # Subdomains that use the public gateway by default
   "twistlock"
 )
 PASSTHROUGH_SUBDOMAINS=( # Subdomains that use the passthrough gateway by default
-  "keycloak"
   "vault"
 )
 
@@ -156,6 +156,10 @@ function process_arguments {
       EXTERNAL_DEPENDENCIES=true
       ;;
 
+    --keycloak-tls-terminate)
+      KEYCLOAK_TLS_TERMINATED=true
+      ;;
+
     -H|--existing-public-ip)
       shift
       PublicIP=$1
@@ -251,6 +255,7 @@ function process_arguments {
       echo "                                  configure databases and add buckets with"
       echo "                                  K3D_DEV_POSTGRES_DATABASES and"
       echo "                                  K3D_DEV_GARAGE_BUCKETS"
+      echo " --keycloak-tls-terminate         set Keycloak to use default public gateway"
       echo " -U|--ssh-username USERNAME       username to use when connecting"
       echo "                                  to existing system in -P (default"
       echo "                                  value depends on cloud provider,"
@@ -1620,6 +1625,14 @@ function create_instances {
 
 function main {
   process_arguments "$@"
+
+  # Place Keycloak after processing arguments so TLS termination can select the gateway.
+  if [[ "${KEYCLOAK_TLS_TERMINATED}" == "true" ]]; then
+    PUBLIC_SUBDOMAINS+=("keycloak")
+  else
+    PASSTHROUGH_SUBDOMAINS+=("keycloak")
+  fi
+
   set_domains
 
   extratools=""

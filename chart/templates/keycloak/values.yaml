@@ -6,11 +6,16 @@
 {{- $cleanedValues := include "mergeLegacyIstioHardenedKeys" (dict "values" .Values.addons.keycloak.values) | fromYaml -}}
 {{- $keycloakPackage = set $keycloakPackage "values" $cleanedValues -}}
 {{- end -}}
+{{- $defaults := include "bigbang.defaults.keycloak" . -}}
+{{- /* Keep the merged extraEnv in the overlay so Flux does not replace it with the original string. */ -}}
+{{- if hasKey (dig "values" "upstream" dict $keycloakPackage) "extraEnv" -}}
+{{- $_ := set $keycloakPackage.values.upstream "extraEnv" ($defaults | fromYaml).upstream.extraEnv -}}
+{{- end -}}
 {{- include "values-secret" (dict 
   "root" $ 
   "package" $keycloakPackage
   "name" "keycloak" 
-  "defaults" (include "bigbang.defaults.keycloak" . )
+  "defaults" $defaults
 ) }}
 {{- end }}
 
@@ -18,7 +23,7 @@
 {{- $istioEnabled := eq (include "istioEnabled" .) "true" }}
 {{- $istioHardenedEnabled := or (dig "istio" "hardened" "enabled" false .Values.addons.keycloak.values) (dig "hardened" "enabled" false .Values.istiod.values) }}
 {{- $monitoringEnabled := eq (include "metricScrapingEnabled" .) "true" }}
-{{- $tlsEnabled := and .Values.addons.keycloak.ingress.cert .Values.addons.keycloak.ingress.key -}}
+{{- $tlsEnabled := and (not (empty .Values.addons.keycloak.ingress.cert)) (not (empty .Values.addons.keycloak.ingress.key)) -}}
 {{- $externalPostgresEnabled := or (ne .Values.addons.keycloak.database.host "") (ne (dig "upstream" "database" "hostname" "" .Values.addons.keycloak.values) "") -}}
 
 # hostname is deprecated and replaced with domain. But if hostname exists then use it.
@@ -34,13 +39,13 @@ routes:
     keycloak:
       enabled: true
       gateways:
-        - {{ include "getGatewayName" (dict "default" "passthrough" "gateway" .Values.addons.keycloak.ingress.gateway "root" .)}}
+        - {{ include "getGatewayName" (dict "default" (ternary "passthrough" "public" $tlsEnabled) "gateway" .Values.addons.keycloak.ingress.gateway "root" .)}}
       hosts:
         - keycloak.{{ $domainName }}
       service: keycloak-keycloak-http.keycloak.svc.cluster.local
-      port: 8443
+      port: {{ ternary 8443 8080 $tlsEnabled }}
       passthrough:
-        enabled: true
+        enabled: {{ $tlsEnabled }}
   outbound:
     bb-tests:
       enabled: {{ dig "bbtests" "enabled" false .Values.addons.keycloak.values }}
@@ -107,25 +112,47 @@ upstream:
   http:
     internalScheme: HTTP
 
+  {{- if not $tlsEnabled }}
+  proxy:
+    mode: xforwarded # Set this so the proper env variable gets set
+  service:
+    httpPort: 8080 # For some reason upstream has this hard coded to 8080 on the stateful set :(
+  {{- end }}
+
+  {{- $defaultEnv := list
+    (dict "name" "KC_HTTPS_CLIENT_AUTH" "value" "request")
+    (dict "name" "KC_TRUSTSTORE_PATHS" "value" "/etc/ssl/certs/")
+    (dict "name" "KC_HOSTNAME" "value" (printf "keycloak.%s" .Values.domain))
+    (dict "name" "KC_HOSTNAME_STRICT" "value" "true")
+  }}
+  {{- if $tlsEnabled }}
+    {{- $defaultEnv = concat $defaultEnv (list
+      (dict "name" "KC_HTTPS_CERTIFICATE_FILE" "value" "/opt/keycloak/conf/tls.crt")
+      (dict "name" "KC_HTTPS_CERTIFICATE_KEY_FILE" "value" "/opt/keycloak/conf/tls.key")
+    ) }}
+  {{- else }}
+    {{- $defaultEnv = append $defaultEnv (dict "name" "KC_SPI_X509CERT_LOOKUP_PROVIDER" "value" "envoy") }}
+  {{- end }}
+  {{- if eq (dig "http" "internalScheme" "HTTP" .Values.addons.keycloak.values) "HTTP" }}
+    {{- $defaultEnv = append $defaultEnv (dict "name" "KC_HTTP_MANAGEMENT_SCHEME" "value" "http") }}
+  {{- end }}
+
+  {{- $userEnv := fromYamlArray (dig "upstream" "extraEnv" "" .Values.addons.keycloak.values | default "[]") }}
+  {{- $envByName := dict }}
+  {{- $envOrder := list }}
+  {{- /* Replace whole entries by name so a user valueFrom does not retain a default value. */}}
+  {{- range concat $defaultEnv $userEnv }}
+    {{- if not (hasKey $envByName .name) }}
+      {{- $envOrder = append $envOrder .name }}
+    {{- end }}
+    {{- $_ := set $envByName .name . }}
+  {{- end }}
+  {{- $mergedEnv := list }}
+  {{- range $envOrder }}
+    {{- $mergedEnv = append $mergedEnv (get $envByName .) }}
+  {{- end }}
   extraEnv: |
-    - name: KC_HTTPS_CLIENT_AUTH
-      value: request
-    - name: KC_TRUSTSTORE_PATHS
-      value: /etc/ssl/certs/
-    - name: KC_HOSTNAME
-      value: keycloak.{{ .Values.domain }}
-    - name: KC_HOSTNAME_STRICT
-      value: "true"
-    {{- if $tlsEnabled }}
-    - name: KC_HTTPS_CERTIFICATE_FILE
-      value: /opt/keycloak/conf/tls.crt
-    - name: KC_HTTPS_CERTIFICATE_KEY_FILE
-      value: /opt/keycloak/conf/tls.key
-    {{- if eq (dig "http" "internalScheme" "HTTP" .Values.addons.keycloak.values) "HTTP" }}
-    - name: KC_HTTP_MANAGEMENT_SCHEME
-      value: http
-    {{- end }}
-    {{- end }}
+    {{- toYaml $mergedEnv | nindent 4 }}
 
   {{- if $istioEnabled }}
   serviceHeadless:

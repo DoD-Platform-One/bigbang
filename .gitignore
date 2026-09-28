@@ -6,6 +6,7 @@ certs/
 
 .terraform
 *.pem
+!/chart/ca-certs/dod-bundle.pem
 *rke2.yaml
 
 *tfstate*

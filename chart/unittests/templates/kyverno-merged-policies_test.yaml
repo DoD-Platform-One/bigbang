@@ -9,6 +9,8 @@ tests:
         args:
           Values:
             addons:
+              keycloak:
+                enabled: false
               vault:
                 enabled: false
               gitlabRunner:
