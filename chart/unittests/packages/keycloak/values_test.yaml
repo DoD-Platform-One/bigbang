@@ -1,0 +1,89 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema/helm-testsuite.json
+suite: Package - Keycloak - Values Tests
+templates:
+  - templates/keycloak/values.yaml
+release:
+  name: bb
+tests:
+  - it: should render http-only defaults when ingress.cert and ingress.key are empty
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-keycloak-values\") | .stringData.defaults' - | yq eval '.'"
+    set:
+      addons.keycloak.enabled: true
+    asserts:
+      - equal:
+          path: routes.inbound.keycloak.port
+          value: 8080
+      - equal:
+          path: routes.inbound.keycloak.passthrough.enabled
+          value: false
+      - equal:
+          path: upstream.proxy.mode
+          value: xforwarded
+      - equal:
+          path: upstream.service.httpPort
+          value: 8080
+      - matchRegex:
+          path: upstream.extraEnv
+          pattern: KC_SPI_X509CERT_LOOKUP_PROVIDER
+      - notExists:
+          path: upstream.secrets
+      - notExists:
+          path: upstream.extraVolumes
+
+  - it: should render https defaults when ingress.cert and ingress.key are set
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-keycloak-values\") | .stringData.defaults' - | yq eval '.'"
+    set:
+      addons.keycloak.enabled: true
+      addons.keycloak.ingress.cert: "test-cert"
+      addons.keycloak.ingress.key: "test-key"
+    asserts:
+      - equal:
+          path: routes.inbound.keycloak.port
+          value: 8443
+      - equal:
+          path: routes.inbound.keycloak.passthrough.enabled
+          value: true
+      - isNotNull:
+          path: upstream.secrets.tlscert
+      - isNotNull:
+          path: upstream.secrets.tlskey
+
+  - it: should merge user extraEnv with defaults and let user values override matching names
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-keycloak-values\") | .stringData.defaults' - | yq eval '.upstream.extraEnv' - | yq eval '{\"env\": .}'"
+    set:
+      addons.keycloak.enabled: true
+      addons.keycloak.values:
+        upstream:
+          extraEnv: |
+            - name: KC_LOG_LEVEL
+              value: "ALL"
+            - name: KC_HOSTNAME_STRICT
+              value: "false"
+    asserts:
+      - contains:
+          path: env
+          content:
+            name: KC_LOG_LEVEL
+            value: "ALL"
+      - contains:
+          path: env
+          content:
+            name: KC_HOSTNAME_STRICT
+            value: "false"
+      - contains:
+          path: env
+          content:
+            name: KC_TRUSTSTORE_PATHS
+            value: "/etc/ssl/certs/"

@@ -1568,23 +1568,6 @@ addons:
         - "start"
         - "--import-realm"
         extraEnv: |-
-          - name: JAVA_OPTS_APPEND
-            value: >-
-              -Djgroups.dns.query={{ include "keycloak.fullname" . }}-headless
-          - name: KC_HTTPS_CERTIFICATE_FILE
-            value: /opt/keycloak/conf/tls.crt
-          - name: KC_HTTP_MANAGEMENT_SCHEME
-            value: http
-          - name: KC_HTTPS_CERTIFICATE_KEY_FILE
-            value: /opt/keycloak/conf/tls.key
-          - name: KC_HTTPS_CLIENT_AUTH
-            value: request
-          - name: KC_TRUSTSTORE_PATHS
-            value: /etc/ssl/certs/
-          - name: KC_HOSTNAME
-            value: keycloak.dev.bigbang.mil
-          - name: KC_HOSTNAME_STRICT
-            value: "true"
           - name: KC_LOG_LEVEL
             value: "ALL"
         secrets:
@@ -1685,7 +1668,6 @@ addons:
           - name: tlskey
             secret:
               secretName: {{ include "keycloak.fullname" . }}-tlskey
-
         extraVolumeMounts: |-
           - name: tlscert
             mountPath: /etc/x509/https/tls.crt

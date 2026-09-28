@@ -87,3 +87,47 @@ tests:
       - equal:
           path: waitJob.enabled
           value: true
+
+  - it: should add a keycloak OPTIONAL_MUTUAL server block to the public gateway when keycloak is enabled without a cert/key
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.defaults' - | yq eval '.'"
+    set:
+      addons.keycloak.enabled: true
+    asserts:
+      - equal:
+          path: gateway.servers[2].hosts[0]
+          value: keycloak.dev.bigbang.mil
+      - equal:
+          path: gateway.servers[2].tls.mode
+          value: OPTIONAL_MUTUAL
+      - equal:
+          path: gateway.servers[2].tls.credentialName
+          value: public-cert
+
+  - it: should not add a keycloak server block to the public gateway when keycloak is disabled
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.defaults' - | yq eval '.'"
+    asserts:
+      - lengthEqual:
+          path: gateway.servers
+          count: 2
+
+  - it: should not add a keycloak server block to the public gateway when keycloak uses a custom gateway
+    postRenderer:
+      cmd: "sh"
+      args:
+        - "-c"
+        - "yq eval 'select(.metadata.name == \"bb-istio-public-gateway-values\") | .stringData.defaults' - | yq eval '.'"
+    set:
+      addons.keycloak.enabled: true
+      addons.keycloak.ingress.gateway: custom
+    asserts:
+      - lengthEqual:
+          path: gateway.servers
+          count: 2
